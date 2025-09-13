@@ -84,41 +84,6 @@
             color: var(--vscode-descriptionForeground);
         }
         
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        
-        .stat-card {
-            background: var(--vscode-editor-background);
-            border: 1px solid var(--vscode-widget-border);
-            border-radius: 6px;
-            padding: 16px;
-            transition: all 0.2s ease;
-        }
-        
-        .stat-card:hover {
-            border-color: var(--vscode-focusBorder);
-            transform: translateY(-2px);
-        }
-        
-        .stat-value {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 4px;
-            color: var(--vscode-foreground);
-        }
-        
-        .stat-label {
-            font-size: 12px;
-            color: var(--vscode-descriptionForeground);
-        }
-        
-        .activity-section {
-            margin-top: 24px;
-        }
         
         .section-title {
             font-size: 14px;
@@ -152,40 +117,6 @@
             word-break: break-all;
         }
         
-        .activity-list {
-            background: var(--vscode-editor-background);
-            border: 1px solid var(--vscode-widget-border);
-            border-radius: 6px;
-            padding: 16px;
-        }
-        
-        .activity-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 8px 0;
-            border-bottom: 1px solid var(--vscode-widget-border);
-        }
-        
-        .activity-item:last-child {
-            border-bottom: none;
-        }
-        
-        .activity-icon {
-            width: 16px;
-            height: 16px;
-            opacity: 0.7;
-        }
-        
-        .activity-text {
-            font-size: 13px;
-            flex: 1;
-        }
-        
-        .activity-time {
-            font-size: 11px;
-            color: var(--vscode-descriptionForeground);
-        }
         
         .action-buttons {
             display: flex;
@@ -218,11 +149,6 @@
             background: var(--vscode-button-secondaryHoverBackground);
         }
         
-        .placeholder-text {
-            color: var(--vscode-descriptionForeground);
-            font-style: italic;
-            font-size: 12px;
-        }
     </style>
 </head>
 <body>
@@ -245,37 +171,6 @@
             <div class="project-path">
                 <span class="project-icon">📁</span>
                 <span class="project-name">${projectPath}</span>
-            </div>
-        </div>
-        
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value">0</div>
-                <div class="stat-label">Active Connections</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">0</div>
-                <div class="stat-label">Requests Processed</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">0ms</div>
-                <div class="stat-label">Avg Response Time</div>
-            </div>
-        </div>
-        
-        <div class="activity-section">
-            <h2 class="section-title">Recent Activity</h2>
-            <div class="activity-list">
-                <div class="activity-item">
-                    <span class="activity-icon">🚀</span>
-                    <span class="activity-text">Server started successfully</span>
-                    <span class="activity-time">Just now</span>
-                </div>
-                <div class="activity-item">
-                    <span class="activity-icon">📊</span>
-                    <span class="activity-text placeholder-text">Waiting for activity...</span>
-                    <span class="activity-time">-</span>
-                </div>
             </div>
         </div>
         
