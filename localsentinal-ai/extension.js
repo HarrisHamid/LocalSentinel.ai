@@ -38,18 +38,10 @@ class LocalSentinalProvider {
 async function startServer() {
   return new Promise((resolve, reject) => {
     exec("lms server start", (error, stdout, stderr) => {
-      if (error) {
-        reject(new Error(`Command failed: ${error.message}`));
-        return;
-      }
+      // Combine stdout and stderr as some CLIs output to stderr
+      const output = (stdout + stderr).trim();
       
-      if (stderr) {
-        reject(new Error(`Command error: ${stderr}`));
-        return;
-      }
-      
-      // Parse the output to extract port number
-      const output = stdout.trim();
+      // Check for the success pattern in the combined output
       const portMatch = output.match(/Server is now running on port (\d+)/);
       
       if (portMatch && portMatch[1]) {
@@ -58,6 +50,9 @@ async function startServer() {
           port: portMatch[1],
           fullOutput: output
         });
+      } else if (error) {
+        // Only reject if there's an actual error and no success pattern
+        reject(new Error(`Command failed: ${error.message}`));
       } else {
         // Unexpected output format
         reject(new Error(`Unexpected output format: ${output}`));
