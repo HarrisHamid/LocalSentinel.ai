@@ -32,3 +32,12 @@ AI-accelerated coding ships features faster than security and compliance can rev
 - **Standardized attestation**: tailored for M&A/vendor due diligence
 
 ---
+
+## 👤 Team
+- **Harris Hamid**: hhamid@stevens.edu  
+- **Ivan Farfand Diaz**: ifarfand@stevens.edu  
+- **Akbar Pathan**: apathan5@stevens.edu
+- **Azhar Pathan**: apathan4@stevens.edu  
+- **Emran Nasseri**: enasseri@stevens.edu
+
+---
