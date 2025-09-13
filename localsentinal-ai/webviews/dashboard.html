@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalSentinel.ai Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            background-color: var(--vscode-sideBar-background);
+            color: var(--vscode-foreground);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            overflow-y: auto;
+        }
+        
+        .dashboard-container {
+            max-width: 100%;
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--vscode-widget-border);
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-small {
+            width: 32px;
+            height: 32px;
+        }
+        
+        .logo-small img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .server-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--vscode-charts-green);
+            box-shadow: 0 0 6px rgba(0, 255, 0, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .status-text {
+            font-size: 13px;
+            color: var(--vscode-descriptionForeground);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: var(--vscode-editor-background);
+            border: 1px solid var(--vscode-widget-border);
+            border-radius: 6px;
+            padding: 16px;
+            transition: all 0.2s ease;
+        }
+        
+        .stat-card:hover {
+            border-color: var(--vscode-focusBorder);
+            transform: translateY(-2px);
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--vscode-foreground);
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--vscode-descriptionForeground);
+        }
+        
+        .activity-section {
+            margin-top: 24px;
+        }
+        
+        .section-title {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: var(--vscode-foreground);
+        }
+        
+        .activity-list {
+            background: var(--vscode-editor-background);
+            border: 1px solid var(--vscode-widget-border);
+            border-radius: 6px;
+            padding: 16px;
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--vscode-widget-border);
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 16px;
+            height: 16px;
+            opacity: 0.7;
+        }
+        
+        .activity-text {
+            font-size: 13px;
+            flex: 1;
+        }
+        
+        .activity-time {
+            font-size: 11px;
+            color: var(--vscode-descriptionForeground);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 24px;
+        }
+        
+        .action-button {
+            background: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+            border: none;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .action-button:hover {
+            background: var(--vscode-button-hoverBackground);
+        }
+        
+        .action-button.secondary {
+            background: var(--vscode-button-secondaryBackground);
+            color: var(--vscode-button-secondaryForeground);
+        }
+        
+        .action-button.secondary:hover {
+            background: var(--vscode-button-secondaryHoverBackground);
+        }
+        
+        .placeholder-text {
+            color: var(--vscode-descriptionForeground);
+            font-style: italic;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <div class="header-left">
+                <div class="logo-small">
+                    <img src="${logoUri}" alt="LocalSentinel.ai" />
+                </div>
+                <h1 style="font-size: 16px; font-weight: 400;">LocalSentinel.ai</h1>
+            </div>
+            <div class="server-status">
+                <div class="status-dot"></div>
+                <span class="status-text">Server running on port ${serverPort}</span>
+            </div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">0</div>
+                <div class="stat-label">Active Connections</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">0</div>
+                <div class="stat-label">Requests Processed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">0ms</div>
+                <div class="stat-label">Avg Response Time</div>
+            </div>
+        </div>
+        
+        <div class="activity-section">
+            <h2 class="section-title">Recent Activity</h2>
+            <div class="activity-list">
+                <div class="activity-item">
+                    <span class="activity-icon">🚀</span>
+                    <span class="activity-text">Server started successfully</span>
+                    <span class="activity-time">Just now</span>
+                </div>
+                <div class="activity-item">
+                    <span class="activity-icon">📊</span>
+                    <span class="activity-text placeholder-text">Waiting for activity...</span>
+                    <span class="activity-time">-</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="action-button" onclick="openDashboard()">
+                Open Web Dashboard
+            </button>
+            <button class="action-button secondary" onclick="stopServer()">
+                Stop Server
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const vscode = acquireVsCodeApi();
+        
+        function openDashboard() {
+            vscode.postMessage({
+                command: 'openDashboard'
+            });
+        }
+        
+        function stopServer() {
+            if (confirm('Are you sure you want to stop the server?')) {
+                vscode.postMessage({
+                    command: 'stopServer'
+                });
+            }
+        }
+        
+        // Listen for messages from the extension
+        window.addEventListener('message', event => {
+            const message = event.data;
+            
+            switch (message.command) {
+                case 'updateStats':
+                    // Update statistics when received from extension
+                    break;
+                case 'serverStopped':
+                    // Handle server stopped event
+                    break;
+            }
+        });
+    </script>
+</body>
+</html>

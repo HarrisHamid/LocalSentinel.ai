@@ -38,8 +38,8 @@ class LocalSentinalWebviewProvider {
             this.serverRunning = true;
             this.serverPort = result.port;
 
-            // Notify webview that server started
-            webviewView.webview.postMessage({ command: "serverStarted" });
+            // Switch to dashboard view
+            this.switchToDashboard();
           } catch (error) {
             vscode.window.showErrorMessage(
               `❌ Failed to start server: ${error.message}`
@@ -59,12 +59,31 @@ class LocalSentinalWebviewProvider {
             );
           }
           break;
+
+        case "openDashboard":
+          if (this.serverPort) {
+            vscode.env.openExternal(vscode.Uri.parse(`http://localhost:${this.serverPort}`));
+          }
+          break;
+
+        case "stopServer":
+          try {
+            // For now, just reset the state - actual stop command would be implemented here
+            this.serverRunning = false;
+            this.serverPort = null;
+            this.switchToWelcome();
+            vscode.window.showInformationMessage("Server stopped");
+          } catch (error) {
+            vscode.window.showErrorMessage(`Failed to stop server: ${error.message}`);
+          }
+          break;
       }
     });
   }
 
-  getWebviewContent(webview) {
-    const htmlPath = path.join(this._context.extensionPath, 'webviews', 'webview.html');
+  getWebviewContent(webview, view = 'welcome') {
+    const htmlFile = view === 'dashboard' ? 'dashboard.html' : 'webview.html';
+    const htmlPath = path.join(this._context.extensionPath, 'webviews', htmlFile);
     let html = fs.readFileSync(htmlPath, 'utf8');
     
     // Get the URI for the logo
@@ -75,7 +94,24 @@ class LocalSentinalWebviewProvider {
     // Replace the placeholder with the actual URI
     html = html.replace('${logoUri}', logoUri);
     
+    // Replace server port if in dashboard view
+    if (view === 'dashboard' && this.serverPort) {
+      html = html.replace('${serverPort}', this.serverPort);
+    }
+    
     return html;
+  }
+
+  switchToDashboard() {
+    if (this._view) {
+      this._view.webview.html = this.getWebviewContent(this._view.webview, 'dashboard');
+    }
+  }
+
+  switchToWelcome() {
+    if (this._view) {
+      this._view.webview.html = this.getWebviewContent(this._view.webview, 'welcome');
+    }
   }
 }
 
@@ -175,11 +211,9 @@ function activate(context) {
         webviewProvider.serverRunning = true;
         webviewProvider.serverPort = result.port;
 
-        // Update webview if available
+        // Switch to dashboard view if webview is available
         if (webviewProvider._view) {
-          webviewProvider._view.webview.postMessage({
-            command: "serverStarted",
-          });
+          webviewProvider.switchToDashboard();
         }
       } catch (error) {
         vscode.window.showErrorMessage(
