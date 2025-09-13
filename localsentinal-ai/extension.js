@@ -12,42 +12,36 @@ class LocalSentinalWebviewProvider {
 
     webviewView.webview.options = {
       enableScripts: true,
-      localResourceRoots: [],
+      localResourceRoots: []
     };
 
     webviewView.webview.html = this.getWebviewContent();
 
     // Handle messages from webview
-    webviewView.webview.onDidReceiveMessage(async (message) => {
-      switch (message.command) {
-        case "startServer":
-          try {
-            vscode.window.showInformationMessage(
-              "🚀 Starting LocalSentinal.ai server..."
-            );
-            await startServer();
-            vscode.window.showInformationMessage(
-              "✅ LocalSentinal.ai server started successfully!"
-            );
-            this.serverRunning = true;
-
-            // Notify webview that server started
-            webviewView.webview.postMessage({ command: "serverStarted" });
-          } catch (error) {
-            vscode.window.showErrorMessage(
-              `❌ Failed to start server: ${error.message}`
-            );
-            webviewView.webview.postMessage({ command: "serverError" });
-          }
-          break;
-
-        case "showServerStatus":
-          vscode.window.showInformationMessage(
-            "🟢 LocalSentinal.ai server is running on port 8080"
-          );
-          break;
+    webviewView.webview.onDidReceiveMessage(
+      async (message) => {
+        switch (message.command) {
+          case 'startServer':
+            try {
+              vscode.window.showInformationMessage("🚀 Starting LocalSentinal.ai server...");
+              await startServer();
+              vscode.window.showInformationMessage("✅ LocalSentinal.ai server started successfully!");
+              this.serverRunning = true;
+              
+              // Notify webview that server started
+              webviewView.webview.postMessage({ command: 'serverStarted' });
+            } catch (error) {
+              vscode.window.showErrorMessage(`❌ Failed to start server: ${error.message}`);
+              webviewView.webview.postMessage({ command: 'serverError' });
+            }
+            break;
+            
+          case 'showServerStatus':
+            vscode.window.showInformationMessage("🟢 LocalSentinal.ai server is running on port 8080");
+            break;
+        }
       }
-    });
+    );
   }
 
   getWebviewContent() {
@@ -262,7 +256,7 @@ class LocalSentinalWebviewProvider {
     
     <div class="welcome-container">
         <div class="logo">
-            🛡️
+            <img src="${logoUri}" alt="LocalSentinal.ai Logo" />
         </div>
         <h1>Welcome to LocalSentinal.ai</h1>
         <div class="subtitle">Let's get started</div>
@@ -376,16 +370,16 @@ function activate(context) {
 
   // Create webview provider for sidebar
   const webviewProvider = new LocalSentinalWebviewProvider(context);
-
+  
   // Register webview provider for the sidebar view
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
-      "localsentinalView",
+      "localsentinalView", 
       webviewProvider,
       {
         webviewOptions: {
-          retainContextWhenHidden: true,
-        },
+          retainContextWhenHidden: true
+        }
       }
     )
   );
@@ -409,34 +403,29 @@ function activate(context) {
       }
 
       try {
-        vscode.window.showInformationMessage(
-          "🚀 Starting LocalSentinal.ai server..."
-        );
+        vscode.window.showInformationMessage("🚀 Starting LocalSentinal.ai server...");
         await startServer();
-        vscode.window.showInformationMessage(
-          "✅ LocalSentinal.ai server started successfully!"
-        );
+        vscode.window.showInformationMessage("✅ LocalSentinal.ai server started successfully!");
         webviewProvider.serverRunning = true;
-
+        
         // Update webview if available
         if (webviewProvider._view) {
-          webviewProvider._view.webview.postMessage({
-            command: "serverStarted",
-          });
+          webviewProvider._view.webview.postMessage({ command: 'serverStarted' });
         }
       } catch (error) {
-        vscode.window.showErrorMessage(
-          `❌ Failed to start server: ${error.message}`
-        );
+        vscode.window.showErrorMessage(`❌ Failed to start server: ${error.message}`);
         if (webviewProvider._view) {
-          webviewProvider._view.webview.postMessage({ command: "serverError" });
+          webviewProvider._view.webview.postMessage({ command: 'serverError' });
         }
       }
     }
   );
 
   // Add all disposables to subscriptions
-  context.subscriptions.push(helloWorldDisposable, startServerDisposable);
+  context.subscriptions.push(
+    helloWorldDisposable,
+    startServerDisposable
+  );
 }
 
 function deactivate() {}
