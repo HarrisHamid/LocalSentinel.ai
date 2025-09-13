@@ -1,33 +1,90 @@
 {
   "name": "localsentinal-ai",
   "displayName": "LocalSentinal.ai",
-  "description": "Scan a repo locally, find hidden backdoors/data-leaks/bad practices, then propose safe fixes — fully offline on Snapdragon X",
+  "description": "LocalSentinal AI Extension",
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.104.0"
+    "vscode": "^1.74.0"
   },
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onView:localsentinalView"
+  ],
   "main": "./extension.js",
   "contributes": {
-    "commands": [{
-      "command": "localsentinal-ai.helloWorld",
-      "title": "Hello World"
-    }]
+    "views": {
+      "localsentinal": [
+        {
+          "id": "localsentinalView",
+          "name": "LocalSentinal.ai",
+          "when": "true"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "localsentinal",
+          "title": "LocalSentinal.ai",
+          "icon": "$(cloud-upload)"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "localsentinal-ai.upload",
+        "title": "Upload",
+        "icon": "$(cloud-upload)"
+      },
+      {
+        "command": "localsentinal-ai.edit",
+        "title": "Edit",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "localsentinal-ai.delete",
+        "title": "Delete",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "localsentinal-ai.helloWorld",
+        "title": "Hello World"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "localsentinal-ai.upload",
+          "when": "view == localsentinalView",
+          "group": "navigation@1"
+        },
+        {
+          "command": "localsentinal-ai.edit",
+          "when": "view == localsentinalView",
+          "group": "navigation@2"
+        },
+        {
+          "command": "localsentinal-ai.delete",
+          "when": "view == localsentinalView",
+          "group": "navigation@3"
+        }
+      ]
+    }
   },
   "scripts": {
     "lint": "eslint .",
     "pretest": "npm run lint",
-    "test": "vscode-test"
+    "test": "node ./test/runTest.js"
   },
   "devDependencies": {
-    "@types/vscode": "^1.104.0",
-    "@types/mocha": "^10.0.10",
-    "@types/node": "22.x",
-    "eslint": "^9.34.0",
-    "@vscode/test-cli": "^0.0.11",
-    "@vscode/test-electron": "^2.5.2"
+    "@types/vscode": "^1.74.0",
+    "@types/node": "16.x",
+    "eslint": "^8.28.0",
+    "glob": "^8.0.3",
+    "mocha": "^10.1.0",
+    "typescript": "^4.9.4",
+    "@vscode/test-electron": "^2.2.0"
   }
 }
