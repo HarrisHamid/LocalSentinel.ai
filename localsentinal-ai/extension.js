@@ -72,13 +72,14 @@ class LocalSentinalWebviewProvider {
 
         case "stopServer":
           try {
-            // For now, just reset the state - actual stop command would be implemented here
+            vscode.window.showInformationMessage("🛑 Stopping LocalSentinel.ai server...");
+            await stopServer();
             this.serverRunning = false;
             this.serverPort = null;
             this.switchToWelcome();
-            vscode.window.showInformationMessage("Server stopped");
+            vscode.window.showInformationMessage("✅ Server stopped successfully");
           } catch (error) {
-            vscode.window.showErrorMessage(`Failed to stop server: ${error.message}`);
+            vscode.window.showErrorMessage(`❌ Failed to stop server: ${error.message}`);
           }
           break;
       }
@@ -164,6 +165,28 @@ async function startServer() {
       } else {
         // Unexpected output format or other error
         reject(new Error(`Server failed to start. Output: ${output}`));
+      }
+    });
+  });
+}
+
+// Async function for stop server functionality
+async function stopServer() {
+  return new Promise((resolve, reject) => {
+    exec("lms server stop", (error, stdout, stderr) => {
+      // The lms command outputs to stderr, so we primarily check stderr
+      const output = stderr.trim();
+
+      // Check if server stopped successfully
+      if (output.includes("Server stopped") || output.includes("stopped successfully") || !error) {
+        resolve({
+          success: true,
+          output: output,
+        });
+      } else if (error) {
+        reject(new Error(`Command failed: ${error.message}`));
+      } else {
+        reject(new Error(`Failed to stop server. Output: ${output}`));
       }
     });
   });
