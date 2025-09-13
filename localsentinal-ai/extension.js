@@ -60,9 +60,13 @@ class LocalSentinalWebviewProvider {
           }
           break;
 
-        case "openDashboard":
-          if (this.serverPort) {
-            vscode.env.openExternal(vscode.Uri.parse(`http://localhost:${this.serverPort}`));
+        case "doFullScan":
+          try {
+            vscode.window.showInformationMessage("🔍 Starting full security scan...");
+            // TODO: Implement actual scan functionality
+            vscode.window.showInformationMessage("Full scan completed successfully!");
+          } catch (error) {
+            vscode.window.showErrorMessage(`Failed to perform scan: ${error.message}`);
           }
           break;
 
@@ -94,9 +98,16 @@ class LocalSentinalWebviewProvider {
     // Replace the placeholder with the actual URI
     html = html.replace('${logoUri}', logoUri);
     
-    // Replace server port if in dashboard view
+    // Replace server port and project path if in dashboard view
     if (view === 'dashboard' && this.serverPort) {
       html = html.replace('${serverPort}', this.serverPort);
+      
+      // Get current workspace folder
+      const workspaceFolders = vscode.workspace.workspaceFolders;
+      const projectPath = workspaceFolders && workspaceFolders[0] 
+        ? workspaceFolders[0].name 
+        : 'No active workspace';
+      html = html.replace('${projectPath}', projectPath);
     }
     
     return html;

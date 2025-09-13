@@ -127,6 +127,31 @@
             color: var(--vscode-foreground);
         }
         
+        .project-info {
+            margin-bottom: 24px;
+        }
+        
+        .project-path {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--vscode-editor-background);
+            border: 1px solid var(--vscode-widget-border);
+            border-radius: 4px;
+            padding: 12px;
+            font-family: var(--vscode-editor-font-family);
+            font-size: 13px;
+        }
+        
+        .project-icon {
+            font-size: 16px;
+        }
+        
+        .project-name {
+            color: var(--vscode-foreground);
+            word-break: break-all;
+        }
+        
         .activity-list {
             background: var(--vscode-editor-background);
             border: 1px solid var(--vscode-widget-border);
@@ -215,6 +240,14 @@
             </div>
         </div>
         
+        <div class="project-info">
+            <div class="section-title">Active Project</div>
+            <div class="project-path">
+                <span class="project-icon">📁</span>
+                <span class="project-name">${projectPath}</span>
+            </div>
+        </div>
+        
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-value">0</div>
@@ -247,8 +280,8 @@
         </div>
         
         <div class="action-buttons">
-            <button class="action-button" onclick="openDashboard()">
-                Open Web Dashboard
+            <button class="action-button" onclick="doFullScan()">
+                Do Full Scan
             </button>
             <button class="action-button secondary" onclick="stopServer()">
                 Stop Server
@@ -259,9 +292,9 @@
     <script>
         const vscode = acquireVsCodeApi();
         
-        function openDashboard() {
+        function doFullScan() {
             vscode.postMessage({
-                command: 'openDashboard'
+                command: 'doFullScan'
             });
         }
         
