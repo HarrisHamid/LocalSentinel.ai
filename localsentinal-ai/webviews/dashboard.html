@@ -194,11 +194,9 @@
         }
         
         function stopServer() {
-            if (confirm('Are you sure you want to stop the server?')) {
-                vscode.postMessage({
-                    command: 'stopServer'
-                });
-            }
+            vscode.postMessage({
+                command: 'stopServer'
+            });
         }
         
         // Listen for messages from the extension
