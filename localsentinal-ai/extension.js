@@ -1,5 +1,7 @@
 const vscode = require("vscode");
 const { exec } = require("child_process");
+const fs = require("fs");
+const path = require("path");
 
 // WebView Provider for sidebar integration
 class LocalSentinalWebviewProvider {
@@ -26,11 +28,12 @@ class LocalSentinalWebviewProvider {
             vscode.window.showInformationMessage(
               "🚀 Starting LocalSentinal.ai server..."
             );
-            await startServer();
+            const result = await startServer();
             vscode.window.showInformationMessage(
-              "✅ LocalSentinal.ai server started successfully!"
+              `✅ Success! Server is now running on port ${result.port}`
             );
             this.serverRunning = true;
+            this.serverPort = result.port;
 
             // Notify webview that server started
             webviewView.webview.postMessage({ command: "serverStarted" });
@@ -43,319 +46,23 @@ class LocalSentinalWebviewProvider {
           break;
 
         case "showServerStatus":
-          vscode.window.showInformationMessage(
-            "🟢 LocalSentinal.ai server is running on port 8080"
-          );
+          if (this.serverRunning && this.serverPort) {
+            vscode.window.showInformationMessage(
+              `🟢 LocalSentinal.ai server is running on port ${this.serverPort}`
+            );
+          } else {
+            vscode.window.showInformationMessage(
+              "⚫ LocalSentinal.ai server is not running"
+            );
+          }
           break;
       }
     });
   }
 
   getWebviewContent() {
-    return `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LocalSentinal.ai</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
-            background-color: var(--vscode-sideBar-background);
-            color: var(--vscode-foreground);
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-            overflow: hidden;
-        }
-        
-        .welcome-container {
-            text-align: center;
-            max-width: 240px;
-            width: 100%;
-            animation: fadeIn 0.6s ease-out;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .logo {
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, var(--vscode-button-background), var(--vscode-button-hoverBackground));
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            transition: transform 0.2s ease;
-        }
-        
-        .logo:hover {
-            transform: scale(1.05);
-        }
-        
-        h1 {
-            font-size: 20px;
-            font-weight: 300;
-            margin-bottom: 8px;
-            color: var(--vscode-foreground);
-            line-height: 1.3;
-        }
-        
-        .subtitle {
-            font-size: 13px;
-            color: var(--vscode-descriptionForeground);
-            margin-bottom: 24px;
-            font-weight: 400;
-        }
-        
-        .start-button {
-            background: var(--vscode-button-background);
-            color: var(--vscode-button-foreground);
-            border: none;
-            padding: 12px 20px;
-            font-size: 13px;
-            font-weight: 500;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            width: 100%;
-            max-width: 160px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            margin: 0 auto;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-        
-        .start-button:hover {
-            background: var(--vscode-button-hoverBackground);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-        
-        .start-button:active {
-            transform: translateY(0);
-        }
-        
-        .start-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .start-button.running {
-            background: var(--vscode-testing-iconPassed);
-            color: var(--vscode-button-foreground);
-        }
-        
-        .start-button.running:hover {
-            background: var(--vscode-testing-iconPassed);
-            opacity: 0.9;
-        }
-        
-        .loading-container {
-            display: none;
-            margin-top: 16px;
-            color: var(--vscode-descriptionForeground);
-            font-size: 12px;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-        
-        .loading-container.show {
-            display: flex;
-        }
-        
-        .spinner {
-            width: 14px;
-            height: 14px;
-            border: 2px solid var(--vscode-descriptionForeground);
-            border-radius: 50%;
-            border-top-color: transparent;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .status-indicator {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--vscode-charts-red);
-            transition: background-color 0.3s ease;
-        }
-        
-        .status-indicator.running {
-            background: var(--vscode-charts-green);
-            box-shadow: 0 0 6px rgba(0, 255, 0, 0.3);
-        }
-        
-        .footer {
-            position: absolute;
-            bottom: 12px;
-            font-size: 10px;
-            color: var(--vscode-descriptionForeground);
-            opacity: 0.7;
-        }
-        
-        /* Dark theme adjustments */
-        body[data-vscode-theme-kind="vscode-dark"] .logo {
-            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
-        }
-        
-        body[data-vscode-theme-kind="vscode-dark"] .start-button {
-            box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
-        }
-        
-        body[data-vscode-theme-kind="vscode-dark"] .start-button:hover {
-            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
-        }
-        
-        /* Responsive adjustments for sidebar */
-        @media (max-width: 220px) {
-            .welcome-container {
-                max-width: 180px;
-            }
-            
-            h1 {
-                font-size: 18px;
-            }
-            
-            .logo {
-                width: 48px;
-                height: 48px;
-                font-size: 20px;
-            }
-            
-            .start-button {
-                padding: 10px 16px;
-                font-size: 12px;
-                max-width: 140px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="status-indicator" id="statusIndicator"></div>
-    
-    <div class="welcome-container">
-        <div class="logo">
-            🛡️
-        </div>
-        <h1>Welcome to LocalSentinal.ai</h1>
-        <div class="subtitle">Let's get started</div>
-        <button class="start-button" id="startButton" onclick="handleStartServer()">
-            <span id="buttonIcon">▶️</span>
-            <span id="buttonText">Start Server</span>
-        </button>
-        <div class="loading-container" id="loadingContainer">
-            <div class="spinner"></div>
-            <span>Starting server...</span>
-        </div>
-    </div>
-    
-    <div class="footer">AI Security Assistant</div>
-
-    <script>
-        const vscode = acquireVsCodeApi();
-        let serverRunning = false;
-        
-        function handleStartServer() {
-            const button = document.getElementById('startButton');
-            const loading = document.getElementById('loadingContainer');
-            const buttonIcon = document.getElementById('buttonIcon');
-            const buttonText = document.getElementById('buttonText');
-            
-            if (serverRunning) {
-                // Server is running, show status or stop option
-                vscode.postMessage({
-                    command: 'showServerStatus'
-                });
-                return;
-            }
-            
-            // Start server
-            button.disabled = true;
-            button.classList.add('loading');
-            buttonIcon.textContent = '⏳';
-            buttonText.textContent = 'Starting...';
-            loading.classList.add('show');
-            
-            // Send message to extension
-            vscode.postMessage({
-                command: 'startServer'
-            });
-        }
-        
-        function updateServerStatus(running) {
-            const button = document.getElementById('startButton');
-            const loading = document.getElementById('loadingContainer');
-            const statusIndicator = document.getElementById('statusIndicator');
-            const buttonIcon = document.getElementById('buttonIcon');
-            const buttonText = document.getElementById('buttonText');
-            
-            serverRunning = running;
-            button.disabled = false;
-            loading.classList.remove('show');
-            
-            if (running) {
-                button.classList.add('running');
-                buttonIcon.textContent = '✅';
-                buttonText.textContent = 'Server Running';
-                statusIndicator.classList.add('running');
-            } else {
-                button.classList.remove('running', 'loading');
-                buttonIcon.textContent = '▶️';
-                buttonText.textContent = 'Start Server';
-                statusIndicator.classList.remove('running');
-            }
-        }
-        
-        // Listen for messages from the extension
-        window.addEventListener('message', event => {
-            const message = event.data;
-            
-            switch (message.command) {
-                case 'serverStarted':
-                    updateServerStatus(true);
-                    break;
-                case 'serverStopped':
-                    updateServerStatus(false);
-                    break;
-                case 'serverError':
-                    updateServerStatus(false);
-                    break;
-            }
-        });
-        
-        // Initialize with current state
-        updateServerStatus(false);
-    </script>
-</body>
-</html>`;
+    const htmlPath = path.join(this._context.extensionPath, 'webview.html');
+    return fs.readFileSync(htmlPath, 'utf8');
   }
 }
 
@@ -363,24 +70,40 @@ class LocalSentinalWebviewProvider {
 async function startServer() {
   return new Promise((resolve, reject) => {
     exec("lms server start", (error, stdout, stderr) => {
-      // Combine stdout and stderr as some CLIs output to stderr
-      const output = (stdout + stderr).trim();
+      // The lms command outputs to stderr, so we primarily check stderr
+      const output = stderr.trim();
 
-      // Check for the success pattern in the combined output
-      const portMatch = output.match(/Server is now running on port (\d+)/);
+      // Parse the output lines
+      const lines = output.split('\n');
+      
+      // Look for the success pattern in the output
+      let portNumber = null;
+      let hasStartingMessage = false;
+      
+      for (const line of lines) {
+        if (line.includes("Starting server...")) {
+          hasStartingMessage = true;
+        }
+        
+        // Check for success message and extract port
+        const portMatch = line.match(/Success! Server is now running on port (\d+)/);
+        if (portMatch && portMatch[1]) {
+          portNumber = portMatch[1];
+        }
+      }
 
-      if (portMatch && portMatch[1]) {
+      if (portNumber) {
         resolve({
           success: true,
-          port: portMatch[1],
+          port: portNumber,
           fullOutput: output,
         });
-      } else if (error) {
-        // Only reject if there's an actual error and no success pattern
+      } else if (error && !hasStartingMessage) {
+        // Only reject if there's an actual error and no server starting message
         reject(new Error(`Command failed: ${error.message}`));
       } else {
-        // Unexpected output format
-        reject(new Error(`Unexpected output format: ${output}`));
+        // Unexpected output format or other error
+        reject(new Error(`Server failed to start. Output: ${output}`));
       }
     });
   });
@@ -422,7 +145,9 @@ function activate(context) {
     "localsentinal-ai.startServer",
     async function () {
       if (webviewProvider.serverRunning) {
-        vscode.window.showInformationMessage("Server is already running!");
+        vscode.window.showInformationMessage(
+          `Server is already running on port ${webviewProvider.serverPort}!`
+        );
         return;
       }
 
@@ -430,11 +155,12 @@ function activate(context) {
         vscode.window.showInformationMessage(
           "🚀 Starting LocalSentinal.ai server..."
         );
-        await startServer();
+        const result = await startServer();
         vscode.window.showInformationMessage(
-          "✅ LocalSentinal.ai server started successfully!"
+          `✅ Success! Server is now running on port ${result.port}`
         );
         webviewProvider.serverRunning = true;
+        webviewProvider.serverPort = result.port;
 
         // Update webview if available
         if (webviewProvider._view) {
@@ -442,11 +168,6 @@ function activate(context) {
             command: "serverStarted",
           });
         }
-        vscode.window.showInformationMessage("Starting server...");
-        const result = await startServer();
-        vscode.window.showInformationMessage(
-          `Success! Server is now running on port ${result.port}`
-        );
       } catch (error) {
         vscode.window.showErrorMessage(
           `❌ Failed to start server: ${error.message}`
