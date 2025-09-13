@@ -19,6 +19,7 @@
         {
           "id": "localsentinalView",
           "name": "LocalSentinal.ai",
+          "type": "webview",
           "when": "true"
         }
       ]
@@ -28,7 +29,7 @@
         {
           "id": "localsentinal",
           "title": "LocalSentinal.ai",
-          "icon": "$(cloud-upload)"
+          "icon": "$(shield)"
         }
       ]
     },
@@ -41,6 +42,11 @@
       {
         "command": "localsentinal-ai.helloWorld",
         "title": "Hello World"
+      },
+      {
+        "command": "localsentinal-ai.refreshEntry",
+        "title": "Refresh Entry",
+        "icon": "$(refresh)"
       }
     ],
     "menus": {
