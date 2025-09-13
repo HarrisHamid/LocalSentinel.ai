@@ -15,10 +15,13 @@ class LocalSentinalWebviewProvider {
 
     webviewView.webview.options = {
       enableScripts: true,
-      localResourceRoots: [],
+      localResourceRoots: [
+        vscode.Uri.file(path.join(this._context.extensionPath, 'assets')),
+        vscode.Uri.file(path.join(this._context.extensionPath, 'webviews'))
+      ],
     };
 
-    webviewView.webview.html = this.getWebviewContent();
+    webviewView.webview.html = this.getWebviewContent(webviewView.webview);
 
     // Handle messages from webview
     webviewView.webview.onDidReceiveMessage(async (message) => {
@@ -26,7 +29,7 @@ class LocalSentinalWebviewProvider {
         case "startServer":
           try {
             vscode.window.showInformationMessage(
-              "🚀 Starting LocalSentinal.ai server..."
+              "🚀 Starting LocalSentinel.ai server..."
             );
             const result = await startServer();
             vscode.window.showInformationMessage(
@@ -48,11 +51,11 @@ class LocalSentinalWebviewProvider {
         case "showServerStatus":
           if (this.serverRunning && this.serverPort) {
             vscode.window.showInformationMessage(
-              `🟢 LocalSentinal.ai server is running on port ${this.serverPort}`
+              `🟢 LocalSentinel.ai server is running on port ${this.serverPort}`
             );
           } else {
             vscode.window.showInformationMessage(
-              "⚫ LocalSentinal.ai server is not running"
+              "⚫ LocalSentinel.ai server is not running"
             );
           }
           break;
@@ -60,9 +63,19 @@ class LocalSentinalWebviewProvider {
     });
   }
 
-  getWebviewContent() {
-    const htmlPath = path.join(this._context.extensionPath, 'webview.html');
-    return fs.readFileSync(htmlPath, 'utf8');
+  getWebviewContent(webview) {
+    const htmlPath = path.join(this._context.extensionPath, 'webviews', 'webview.html');
+    let html = fs.readFileSync(htmlPath, 'utf8');
+    
+    // Get the URI for the logo
+    const logoUri = webview.asWebviewUri(
+      vscode.Uri.file(path.join(this._context.extensionPath, 'assets', 'logo_white.svg'))
+    );
+    
+    // Replace the placeholder with the actual URI
+    html = html.replace('${logoUri}', logoUri);
+    
+    return html;
   }
 }
 
@@ -113,7 +126,7 @@ async function startServer() {
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-  console.log("LocalSentinal.ai extension is now active!");
+  console.log("LocalSentinel.ai extension is now active!");
 
   // Create webview provider for sidebar
   const webviewProvider = new LocalSentinalWebviewProvider(context);
@@ -136,7 +149,7 @@ function activate(context) {
     "localsentinal-ai.helloWorld",
     function () {
       vscode.window.showInformationMessage(
-        "Hello World from LocalSentinal.ai!"
+        "Hello World from LocalSentinel.ai!"
       );
     }
   );
@@ -153,7 +166,7 @@ function activate(context) {
 
       try {
         vscode.window.showInformationMessage(
-          "🚀 Starting LocalSentinal.ai server..."
+          "🚀 Starting LocalSentinel.ai server..."
         );
         const result = await startServer();
         vscode.window.showInformationMessage(

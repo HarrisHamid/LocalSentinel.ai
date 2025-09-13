@@ -1,8 +1,9 @@
 {
   "name": "localsentinal-ai",
-  "displayName": "LocalSentinal.ai",
+  "displayName": "LocalSentinel.ai",
   "description": "LocalSentinal AI Extension",
   "version": "0.0.1",
+  "icon": "assets/logo_white.svg",
   "engines": {
     "vscode": "^1.74.0"
   },
@@ -18,7 +19,7 @@
       "localsentinal": [
         {
           "id": "localsentinalView",
-          "name": "LocalSentinal.ai",
+          "name": "LocalSentinel.ai",
           "type": "webview",
           "when": "true"
         }
@@ -28,8 +29,8 @@
       "activitybar": [
         {
           "id": "localsentinal",
-          "title": "LocalSentinal.ai",
-          "icon": "$(shield)"
+          "title": "LocalSentinel.ai",
+          "icon": "assets/logo_white.svg"
         }
       ]
     },

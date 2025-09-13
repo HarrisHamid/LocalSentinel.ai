@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LocalSentinal.ai</title>
+    <title>LocalSentinel.ai</title>
     <style>
         * {
             margin: 0;
@@ -37,17 +37,19 @@
         }
         
         .logo {
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, var(--vscode-button-background), var(--vscode-button-hoverBackground));
-            border-radius: 50%;
+            width: 67px;
+            height: 67px;
             margin: 0 auto 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             transition: transform 0.2s ease;
+        }
+        
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
         
         .logo:hover {
@@ -168,10 +170,6 @@
         }
         
         /* Dark theme adjustments */
-        body[data-vscode-theme-kind="vscode-dark"] .logo {
-            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
-        }
-        
         body[data-vscode-theme-kind="vscode-dark"] .start-button {
             box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
         }
@@ -191,9 +189,8 @@
             }
             
             .logo {
-                width: 48px;
-                height: 48px;
-                font-size: 20px;
+                width: 58px;
+                height: 58px;
             }
             
             .start-button {
@@ -209,12 +206,11 @@
     
     <div class="welcome-container">
         <div class="logo">
-            🛡️
+            <img src="${logoUri}" alt="LocalSentinel.ai Logo" />
         </div>
-        <h1>Welcome to LocalSentinal.ai</h1>
+        <h1>Welcome to LocalSentinel.ai</h1>
         <div class="subtitle">Let's get started</div>
         <button class="start-button" id="startButton" onclick="handleStartServer()">
-            <span id="buttonIcon">▶️</span>
             <span id="buttonText">Start Server</span>
         </button>
         <div class="loading-container" id="loadingContainer">
@@ -232,7 +228,6 @@
         function handleStartServer() {
             const button = document.getElementById('startButton');
             const loading = document.getElementById('loadingContainer');
-            const buttonIcon = document.getElementById('buttonIcon');
             const buttonText = document.getElementById('buttonText');
             
             if (serverRunning) {
@@ -246,7 +241,6 @@
             // Start server
             button.disabled = true;
             button.classList.add('loading');
-            buttonIcon.textContent = '⏳';
             buttonText.textContent = 'Starting...';
             loading.classList.add('show');
             
@@ -260,7 +254,6 @@
             const button = document.getElementById('startButton');
             const loading = document.getElementById('loadingContainer');
             const statusIndicator = document.getElementById('statusIndicator');
-            const buttonIcon = document.getElementById('buttonIcon');
             const buttonText = document.getElementById('buttonText');
             
             serverRunning = running;
@@ -269,12 +262,10 @@
             
             if (running) {
                 button.classList.add('running');
-                buttonIcon.textContent = '✅';
                 buttonText.textContent = 'Server Running';
                 statusIndicator.classList.add('running');
             } else {
                 button.classList.remove('running', 'loading');
-                buttonIcon.textContent = '▶️';
                 buttonText.textContent = 'Start Server';
                 statusIndicator.classList.remove('running');
             }
