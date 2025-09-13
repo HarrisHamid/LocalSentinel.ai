@@ -34,19 +34,9 @@
     },
     "commands": [
       {
-        "command": "localsentinal-ai.upload",
-        "title": "Upload",
-        "icon": "$(cloud-upload)"
-      },
-      {
-        "command": "localsentinal-ai.edit",
-        "title": "Edit",
-        "icon": "$(edit)"
-      },
-      {
-        "command": "localsentinal-ai.delete",
-        "title": "Delete",
-        "icon": "$(trash)"
+        "command": "localsentinal-ai.startServer",
+        "title": "Start Server",
+        "icon": "$(run)"
       },
       {
         "command": "localsentinal-ai.helloWorld",
@@ -56,19 +46,9 @@
     "menus": {
       "view/title": [
         {
-          "command": "localsentinal-ai.upload",
+          "command": "localsentinal-ai.startServer",
           "when": "view == localsentinalView",
           "group": "navigation@1"
-        },
-        {
-          "command": "localsentinal-ai.edit",
-          "when": "view == localsentinalView",
-          "group": "navigation@2"
-        },
-        {
-          "command": "localsentinal-ai.delete",
-          "when": "view == localsentinalView",
-          "group": "navigation@3"
         }
       ]
     }
