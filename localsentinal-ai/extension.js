@@ -71,16 +71,18 @@ class LocalSentinalWebviewProvider {
           break;
 
         case "stopServer":
-          try {
-            vscode.window.showInformationMessage("🛑 Stopping LocalSentinel.ai server...");
-            await stopServer();
-            this.serverRunning = false;
-            this.serverPort = null;
-            this.switchToWelcome();
-            vscode.window.showInformationMessage("✅ Server stopped successfully");
-          } catch (error) {
-            vscode.window.showErrorMessage(`❌ Failed to stop server: ${error.message}`);
-          }
+          (async () => {
+            try {
+              vscode.window.showInformationMessage("🛑 Stopping LocalSentinel.ai server...");
+              await stopServer();
+              this.serverRunning = false;
+              this.serverPort = null;
+              this.switchToWelcome();
+              vscode.window.showInformationMessage("✅ Server stopped successfully");
+            } catch (error) {
+              vscode.window.showErrorMessage(`❌ Failed to stop server: ${error.message}`);
+            }
+          })();
           break;
       }
     });
@@ -174,17 +176,24 @@ async function startServer() {
 async function stopServer() {
   return new Promise((resolve, reject) => {
     exec("lms server stop", (error, stdout, stderr) => {
-      // The lms command outputs to stderr, so we primarily check stderr
-      const output = stderr.trim();
+      // The lms command might output to stderr or stdout
+      const output = (stderr + stdout).trim();
+      
+      console.log("Stop server output:", output);
+      console.log("Stop server error:", error);
 
-      // Check if server stopped successfully
-      if (output.includes("Server stopped") || output.includes("stopped successfully") || !error) {
+      // Check for successful stop patterns or no error
+      if (output.includes("Server stopped") || 
+          output.includes("stopped successfully") || 
+          output.includes("stopped") ||
+          !error ||
+          (error && error.code === 0)) {
         resolve({
           success: true,
           output: output,
         });
       } else if (error) {
-        reject(new Error(`Command failed: ${error.message}`));
+        reject(new Error(`Command failed: ${error.message}. Output: ${output}`));
       } else {
         reject(new Error(`Failed to stop server. Output: ${output}`));
       }
