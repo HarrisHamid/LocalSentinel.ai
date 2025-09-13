@@ -37,7 +37,7 @@ class LocalSentinalProvider {
 // Async function for start server functionality
 async function startServer() {
   return new Promise((resolve, reject) => {
-    exec("lms start server", (error, stdout, stderr) => {
+    exec("lms server start", (error, stdout, stderr) => {
       if (error) {
         reject(new Error(`Command failed: ${error.message}`));
         return;
