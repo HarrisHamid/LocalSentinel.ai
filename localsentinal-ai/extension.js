@@ -1,4 +1,5 @@
 const vscode = require("vscode");
+const { exec } = require("child_process");
 
 // Tree data provider for the sidebar view
 class LocalSentinalProvider {
@@ -36,10 +37,32 @@ class LocalSentinalProvider {
 // Async function for start server functionality
 async function startServer() {
   return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      console.log("Server started successfully");
-      resolve();
-    }, 2000);
+    exec("lms start server", (error, stdout, stderr) => {
+      if (error) {
+        reject(new Error(`Command failed: ${error.message}`));
+        return;
+      }
+      
+      if (stderr) {
+        reject(new Error(`Command error: ${stderr}`));
+        return;
+      }
+      
+      // Parse the output to extract port number
+      const output = stdout.trim();
+      const portMatch = output.match(/Server is now running on port (\d+)/);
+      
+      if (portMatch && portMatch[1]) {
+        resolve({
+          success: true,
+          port: portMatch[1],
+          fullOutput: output
+        });
+      } else {
+        // Unexpected output format
+        reject(new Error(`Unexpected output format: ${output}`));
+      }
+    });
   });
 }
 
@@ -75,8 +98,8 @@ function activate(context) {
     async function () {
       try {
         vscode.window.showInformationMessage("Starting server...");
-        await startServer();
-        vscode.window.showInformationMessage("Server started successfully!");
+        const result = await startServer();
+        vscode.window.showInformationMessage(`Success! Server is now running on port ${result.port}`);
       } catch (error) {
         vscode.window.showErrorMessage(`Failed to start server: ${error.message}`);
       }
