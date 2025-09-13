@@ -1,35 +1,360 @@
 const vscode = require("vscode");
 
-// Tree data provider for the sidebar view
-class LocalSentinalProvider {
-  constructor() {
-    this._onDidChangeTreeData = new vscode.EventEmitter();
-    this.onDidChangeTreeData = this._onDidChangeTreeData.event;
+// WebView Provider for sidebar integration
+class LocalSentinalWebviewProvider {
+  constructor(context) {
+    this._context = context;
+    this.serverRunning = false;
   }
 
-  refresh() {
-    this._onDidChangeTreeData.fire();
-  }
+  resolveWebviewView(webviewView, context, _token) {
+    this._view = webviewView;
 
-  getTreeItem(element) {
-    return element;
-  }
-
-  getChildren() {
-    // Create the Start Server button as tree item
-    const startServerItem = new vscode.TreeItem(
-      "Start Server",
-      vscode.TreeItemCollapsibleState.None
-    );
-    startServerItem.command = {
-      command: "localsentinal-ai.startServer",
-      title: "Start Server",
-      arguments: [],
+    webviewView.webview.options = {
+      enableScripts: true,
+      localResourceRoots: [],
     };
-    startServerItem.iconPath = new vscode.ThemeIcon("run");
-    startServerItem.tooltip = "Start LocalSentinel server";
 
-    return [startServerItem];
+    webviewView.webview.html = this.getWebviewContent();
+
+    // Handle messages from webview
+    webviewView.webview.onDidReceiveMessage(async (message) => {
+      switch (message.command) {
+        case "startServer":
+          try {
+            vscode.window.showInformationMessage(
+              "🚀 Starting LocalSentinal.ai server..."
+            );
+            await startServer();
+            vscode.window.showInformationMessage(
+              "✅ LocalSentinal.ai server started successfully!"
+            );
+            this.serverRunning = true;
+
+            // Notify webview that server started
+            webviewView.webview.postMessage({ command: "serverStarted" });
+          } catch (error) {
+            vscode.window.showErrorMessage(
+              `❌ Failed to start server: ${error.message}`
+            );
+            webviewView.webview.postMessage({ command: "serverError" });
+          }
+          break;
+
+        case "showServerStatus":
+          vscode.window.showInformationMessage(
+            "🟢 LocalSentinal.ai server is running on port 8080"
+          );
+          break;
+      }
+    });
+  }
+
+  getWebviewContent() {
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalSentinal.ai</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            background-color: var(--vscode-sideBar-background);
+            color: var(--vscode-foreground);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            overflow: hidden;
+        }
+        
+        .welcome-container {
+            text-align: center;
+            max-width: 240px;
+            width: 100%;
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .logo {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--vscode-button-background), var(--vscode-button-hoverBackground));
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: transform 0.2s ease;
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        h1 {
+            font-size: 20px;
+            font-weight: 300;
+            margin-bottom: 8px;
+            color: var(--vscode-foreground);
+            line-height: 1.3;
+        }
+        
+        .subtitle {
+            font-size: 13px;
+            color: var(--vscode-descriptionForeground);
+            margin-bottom: 24px;
+            font-weight: 400;
+        }
+        
+        .start-button {
+            background: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+            border: none;
+            padding: 12px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+            max-width: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin: 0 auto;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .start-button:hover {
+            background: var(--vscode-button-hoverBackground);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .start-button:active {
+            transform: translateY(0);
+        }
+        
+        .start-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .start-button.running {
+            background: var(--vscode-testing-iconPassed);
+            color: var(--vscode-button-foreground);
+        }
+        
+        .start-button.running:hover {
+            background: var(--vscode-testing-iconPassed);
+            opacity: 0.9;
+        }
+        
+        .loading-container {
+            display: none;
+            margin-top: 16px;
+            color: var(--vscode-descriptionForeground);
+            font-size: 12px;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .loading-container.show {
+            display: flex;
+        }
+        
+        .spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--vscode-descriptionForeground);
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .status-indicator {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--vscode-charts-red);
+            transition: background-color 0.3s ease;
+        }
+        
+        .status-indicator.running {
+            background: var(--vscode-charts-green);
+            box-shadow: 0 0 6px rgba(0, 255, 0, 0.3);
+        }
+        
+        .footer {
+            position: absolute;
+            bottom: 12px;
+            font-size: 10px;
+            color: var(--vscode-descriptionForeground);
+            opacity: 0.7;
+        }
+        
+        /* Dark theme adjustments */
+        body[data-vscode-theme-kind="vscode-dark"] .logo {
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+        }
+        
+        body[data-vscode-theme-kind="vscode-dark"] .start-button {
+            box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+        }
+        
+        body[data-vscode-theme-kind="vscode-dark"] .start-button:hover {
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
+        }
+        
+        /* Responsive adjustments for sidebar */
+        @media (max-width: 220px) {
+            .welcome-container {
+                max-width: 180px;
+            }
+            
+            h1 {
+                font-size: 18px;
+            }
+            
+            .logo {
+                width: 48px;
+                height: 48px;
+                font-size: 20px;
+            }
+            
+            .start-button {
+                padding: 10px 16px;
+                font-size: 12px;
+                max-width: 140px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="status-indicator" id="statusIndicator"></div>
+    
+    <div class="welcome-container">
+        <div class="logo">
+            🛡️
+        </div>
+        <h1>Welcome to LocalSentinal.ai</h1>
+        <div class="subtitle">Let's get started</div>
+        <button class="start-button" id="startButton" onclick="handleStartServer()">
+            <span id="buttonIcon">▶️</span>
+            <span id="buttonText">Start Server</span>
+        </button>
+        <div class="loading-container" id="loadingContainer">
+            <div class="spinner"></div>
+            <span>Starting server...</span>
+        </div>
+    </div>
+    
+    <div class="footer">AI Security Assistant</div>
+
+    <script>
+        const vscode = acquireVsCodeApi();
+        let serverRunning = false;
+        
+        function handleStartServer() {
+            const button = document.getElementById('startButton');
+            const loading = document.getElementById('loadingContainer');
+            const buttonIcon = document.getElementById('buttonIcon');
+            const buttonText = document.getElementById('buttonText');
+            
+            if (serverRunning) {
+                // Server is running, show status or stop option
+                vscode.postMessage({
+                    command: 'showServerStatus'
+                });
+                return;
+            }
+            
+            // Start server
+            button.disabled = true;
+            button.classList.add('loading');
+            buttonIcon.textContent = '⏳';
+            buttonText.textContent = 'Starting...';
+            loading.classList.add('show');
+            
+            // Send message to extension
+            vscode.postMessage({
+                command: 'startServer'
+            });
+        }
+        
+        function updateServerStatus(running) {
+            const button = document.getElementById('startButton');
+            const loading = document.getElementById('loadingContainer');
+            const statusIndicator = document.getElementById('statusIndicator');
+            const buttonIcon = document.getElementById('buttonIcon');
+            const buttonText = document.getElementById('buttonText');
+            
+            serverRunning = running;
+            button.disabled = false;
+            loading.classList.remove('show');
+            
+            if (running) {
+                button.classList.add('running');
+                buttonIcon.textContent = '✅';
+                buttonText.textContent = 'Server Running';
+                statusIndicator.classList.add('running');
+            } else {
+                button.classList.remove('running', 'loading');
+                buttonIcon.textContent = '▶️';
+                buttonText.textContent = 'Start Server';
+                statusIndicator.classList.remove('running');
+            }
+        }
+        
+        // Listen for messages from the extension
+        window.addEventListener('message', event => {
+            const message = event.data;
+            
+            switch (message.command) {
+                case 'serverStarted':
+                    updateServerStatus(true);
+                    break;
+                case 'serverStopped':
+                    updateServerStatus(false);
+                    break;
+                case 'serverError':
+                    updateServerStatus(false);
+                    break;
+            }
+        });
+        
+        // Initialize with current state
+        updateServerStatus(false);
+    </script>
+</body>
+</html>`;
   }
 }
 
@@ -43,23 +368,29 @@ async function startServer() {
   });
 }
 
-
 /**
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
   console.log("LocalSentinal.ai extension is now active!");
 
-  // Create tree data provider
-  const provider = new LocalSentinalProvider();
+  // Create webview provider for sidebar
+  const webviewProvider = new LocalSentinalWebviewProvider(context);
 
-  // Register tree data provider
-  vscode.window.createTreeView("localsentinalView", {
-    treeDataProvider: provider,
-    showCollapseAll: true,
-  });
+  // Register webview provider for the sidebar view
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(
+      "localsentinalView",
+      webviewProvider,
+      {
+        webviewOptions: {
+          retainContextWhenHidden: true,
+        },
+      }
+    )
+  );
 
-  // Register Hello World command
+  // Register commands
   const helloWorldDisposable = vscode.commands.registerCommand(
     "localsentinal-ai.helloWorld",
     function () {
@@ -69,26 +400,43 @@ function activate(context) {
     }
   );
 
-  // Register Start Server command
   const startServerDisposable = vscode.commands.registerCommand(
     "localsentinal-ai.startServer",
     async function () {
+      if (webviewProvider.serverRunning) {
+        vscode.window.showInformationMessage("Server is already running!");
+        return;
+      }
+
       try {
-        vscode.window.showInformationMessage("Starting server...");
+        vscode.window.showInformationMessage(
+          "🚀 Starting LocalSentinal.ai server..."
+        );
         await startServer();
-        vscode.window.showInformationMessage("Server started successfully!");
+        vscode.window.showInformationMessage(
+          "✅ LocalSentinal.ai server started successfully!"
+        );
+        webviewProvider.serverRunning = true;
+
+        // Update webview if available
+        if (webviewProvider._view) {
+          webviewProvider._view.webview.postMessage({
+            command: "serverStarted",
+          });
+        }
       } catch (error) {
-        vscode.window.showErrorMessage(`Failed to start server: ${error.message}`);
+        vscode.window.showErrorMessage(
+          `❌ Failed to start server: ${error.message}`
+        );
+        if (webviewProvider._view) {
+          webviewProvider._view.webview.postMessage({ command: "serverError" });
+        }
       }
     }
   );
 
-
   // Add all disposables to subscriptions
-  context.subscriptions.push(
-    helloWorldDisposable,
-    startServerDisposable
-  );
+  context.subscriptions.push(helloWorldDisposable, startServerDisposable);
 }
 
 function deactivate() {}
