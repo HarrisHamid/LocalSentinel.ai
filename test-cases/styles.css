@@ -84,6 +84,39 @@ main {
     margin-bottom: 1rem;
 }
 
+/* Make editable prices obvious */
+.price-value {
+    cursor: text;
+    padding: 2px 4px;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+
+.price-value:hover {
+    background-color: #fff3cd;
+}
+
+.price-value:focus {
+    outline: 2px solid #ffc107;
+    background-color: #fff3cd;
+}
+
+#cart-total {
+    cursor: text;
+    padding: 2px 4px;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+
+#cart-total:hover {
+    background-color: #fff3cd;
+}
+
+#cart-total:focus {
+    outline: 2px solid #ffc107;
+    background-color: #fff3cd;
+}
+
 .add-to-cart {
     width: 100%;
     padding: 0.75rem;

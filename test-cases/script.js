@@ -4,9 +4,12 @@ const API_KEY = 'sk-1234567890abcdef-PRODUCTION-KEY';
 // Shopping cart array
 let cart = [];
 
-// VULNERABILITY: Price is passed from client-side and can be manipulated
-function addToCart(id, name, price) {
-    // No server-side validation of price!
+// VULNERABILITY: Price is read directly from editable DOM element
+function addToCart(id, name) {
+    // Get the price from the editable DOM element - user can change this!
+    const priceElement = document.querySelector(`[data-id="${id}"] .price-value`);
+    const price = parseFloat(priceElement.textContent) || 0;
+
     const item = {
         id: id,
         name: name,
@@ -36,16 +39,19 @@ function removeFromCart(id) {
 function updateCartDisplay() {
     const cartItemsDiv = document.getElementById('cart-items');
     const cartTotalSpan = document.getElementById('cart-total');
-    
+
     if (cart.length === 0) {
         cartItemsDiv.innerHTML = '<p>Your cart is empty</p>';
-        cartTotalSpan.textContent = '0.00';
+        // Don't overwrite if user has edited the total
+        if (cartTotalSpan.textContent === '0.00' || cartTotalSpan.textContent === '') {
+            cartTotalSpan.textContent = '0.00';
+        }
         return;
     }
-    
+
     let html = '';
     let total = 0;
-    
+
     cart.forEach(item => {
         html += `
             <div class="cart-item">
@@ -61,9 +67,12 @@ function updateCartDisplay() {
         `;
         total += item.price * item.quantity;
     });
-    
+
     cartItemsDiv.innerHTML = html;
-    cartTotalSpan.textContent = total.toFixed(2);
+    // Only update total if user hasn't manually edited it
+    if (!document.activeElement || document.activeElement.id !== 'cart-total') {
+        cartTotalSpan.textContent = total.toFixed(2);
+    }
 }
 
 function checkout() {
@@ -71,22 +80,23 @@ function checkout() {
         alert('Your cart is empty!');
         return;
     }
-    
-    // VULNERABILITY: Prices come from client-side, not verified server-side
-    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    
+
+    // MAJOR VULNERABILITY: Total is read from editable DOM element!
+    const cartTotalSpan = document.getElementById('cart-total');
+    const total = parseFloat(cartTotalSpan.textContent) || 0;
+
     // Simulate payment processing with exposed API key
     const paymentData = {
         apiKey: API_KEY,
         items: cart,
-        total: total
+        total: total  // User can edit this to any value!
     };
-    
+
     // In real app, this would be a server call
     console.log('Processing payment with data:', paymentData);
-    
+
     alert(`Order placed! Total: $${total.toFixed(2)}\nThank you for your purchase!`);
-    
+
     // Clear cart
     cart = [];
     updateCartDisplay();
