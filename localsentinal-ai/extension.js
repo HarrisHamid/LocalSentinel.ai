@@ -8,6 +8,7 @@ class LocalSentinalWebviewProvider {
   constructor(context) {
     this._context = context;
     this.serverRunning = false;
+    this.selectedFolder = null;
   }
 
   resolveWebviewView(webviewView, context, _token) {
@@ -84,6 +85,42 @@ class LocalSentinalWebviewProvider {
             }
           })();
           break;
+
+        case "selectFolder":
+          (async () => {
+            try {
+              const workspaceFolders = vscode.workspace.workspaceFolders;
+              if (!workspaceFolders || workspaceFolders.length === 0) {
+                vscode.window.showErrorMessage("No workspace folder is open");
+                return;
+              }
+              
+              const workspaceRoot = workspaceFolders[0].uri;
+              const selectedUri = await vscode.window.showOpenDialog({
+                canSelectFolders: true,
+                canSelectFiles: false,
+                canSelectMany: false,
+                defaultUri: workspaceRoot,
+                openLabel: "Select Scan Folder"
+              });
+              
+              if (selectedUri && selectedUri[0]) {
+                const relativePath = vscode.workspace.asRelativePath(selectedUri[0]);
+                this.selectedFolder = relativePath;
+                
+                // Send update to webview
+                if (this._view) {
+                  this._view.webview.postMessage({
+                    command: 'folderSelected',
+                    folderPath: relativePath
+                  });
+                }
+              }
+            } catch (error) {
+              vscode.window.showErrorMessage(`Failed to select folder: ${error.message}`);
+            }
+          })();
+          break;
       }
     });
   }
@@ -111,6 +148,12 @@ class LocalSentinalWebviewProvider {
         ? workspaceFolders[0].name 
         : 'No active workspace';
       html = html.replace('${projectPath}', projectPath);
+      
+      // Set initial selected folder (workspace root by default)
+      const selectedFolder = this.selectedFolder || (workspaceFolders && workspaceFolders[0] 
+        ? workspaceFolders[0].name 
+        : 'Select folder...');
+      html = html.replace('${selectedFolder}', selectedFolder);
     }
     
     return html;

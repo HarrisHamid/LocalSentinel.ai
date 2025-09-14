@@ -117,6 +117,59 @@
             word-break: break-all;
         }
         
+        .folder-selector {
+            margin-top: 16px;
+        }
+        
+        .section-subtitle {
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--vscode-descriptionForeground);
+        }
+        
+        .folder-select-container {
+            position: relative;
+        }
+        
+        .selected-folder {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--vscode-input-background);
+            border: 1px solid var(--vscode-input-border);
+            border-radius: 4px;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 13px;
+        }
+        
+        .selected-folder:hover {
+            border-color: var(--vscode-inputOption-activeBorder);
+            background: var(--vscode-input-background);
+        }
+        
+        .selected-folder:focus {
+            border-color: var(--vscode-focusBorder);
+            outline: none;
+        }
+        
+        .folder-icon {
+            font-size: 14px;
+        }
+        
+        .folder-path {
+            flex: 1;
+            color: var(--vscode-input-foreground);
+            word-break: break-all;
+        }
+        
+        .select-icon {
+            font-size: 10px;
+            color: var(--vscode-descriptionForeground);
+        }
+        
         
         .action-buttons {
             display: flex;
@@ -172,6 +225,16 @@
                 <span class="project-icon">📁</span>
                 <span class="project-name">${projectPath}</span>
             </div>
+            <div class="folder-selector">
+                <div class="section-subtitle">Scan Target Folder</div>
+                <div class="folder-select-container">
+                    <div class="selected-folder" id="selectedFolder" onclick="selectFolder()">
+                        <span class="folder-icon">📂</span>
+                        <span class="folder-path" id="selectedFolderPath">${selectedFolder}</span>
+                        <span class="select-icon">▼</span>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <div class="action-buttons">
@@ -199,6 +262,19 @@
             });
         }
         
+        function selectFolder() {
+            vscode.postMessage({
+                command: 'selectFolder'
+            });
+        }
+        
+        function updateSelectedFolder(folderPath) {
+            const folderPathElement = document.getElementById('selectedFolderPath');
+            if (folderPathElement) {
+                folderPathElement.textContent = folderPath;
+            }
+        }
+        
         // Listen for messages from the extension
         window.addEventListener('message', event => {
             const message = event.data;
@@ -209,6 +285,9 @@
                     break;
                 case 'serverStopped':
                     // Handle server stopped event
+                    break;
+                case 'folderSelected':
+                    updateSelectedFolder(message.folderPath);
                     break;
             }
         });
