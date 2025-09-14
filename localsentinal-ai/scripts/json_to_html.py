@@ -131,11 +131,11 @@ def json_to_html(json_file_path, output_html_path):
     try:
         with open(output_html_path, 'w', encoding='utf-8') as html_file:
             html_file.write(output_html)
-        print(f"✅ HTML file successfully created: {output_html_path}")
-        print(f"📊 Processed {len(data)} top-level keys from JSON")
+        print(f" HTML file successfully created: {output_html_path}")
+        print(f" Processed {len(data)} top-level keys from JSON")
 
         # Print summary of data processed
-        print("\n📋 Data Summary:")
+        print("\n Data Summary:")
         for key, value in data.items():
             if isinstance(value, dict):
                 print(f"  • {key}: {len(value)} properties")
@@ -145,7 +145,7 @@ def json_to_html(json_file_path, output_html_path):
                 print(f"  • {key}: {type(value).__name__}")
 
     except Exception as e:
-        print(f"❌ Error writing HTML file: {e}")
+        print(f" Error writing HTML file: {e}")
 
 def main():
     import sys
@@ -163,18 +163,18 @@ def main():
     report_dir = 'report_html'
     if not os.path.exists(report_dir):
         os.makedirs(report_dir)
-        print(f"📁 Created directory: {report_dir}")
+        print(f" Created directory: {report_dir}")
 
     # Output HTML file in the report_html directory
     html_file = os.path.join(report_dir, f'{base_name}_report.html')
 
     # Check if JSON file exists
     if not os.path.exists(json_file):
-        print(f"❌ Error: '{json_file}' not found")
+        print(f" Error: '{json_file}' not found")
         return False
 
     # Convert JSON to HTML
-    print(f"🔄 Converting {json_file} to {html_file}...")
+    print(f" Converting {json_file} to {html_file}...")
     json_to_html(json_file, html_file)
     return True
 
