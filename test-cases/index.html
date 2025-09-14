@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mike's Bike Shop</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Mike's Bike Shop</h1>
+        <p>Your trusted local bike store since 1995</p>
+    </header>
+
+    <main>
+        <section class="products">
+            <h2>Our Bikes</h2>
+            <div class="bike-grid">
+                <div class="bike-card" data-id="1">
+                    <img src="https://via.placeholder.com/300x200?text=Mountain+Bike" alt="Mountain Bike">
+                    <h3>Mountain Master Pro</h3>
+                    <p>Professional mountain bike for serious riders</p>
+                    <p class="price" data-price="1299.99">$<span class="price-value">1299.99</span></p>
+                    <button class="add-to-cart" onclick="addToCart(1, 'Mountain Master Pro', 1299.99)">Add to Cart</button>
+                </div>
+
+                <div class="bike-card" data-id="2">
+                    <img src="https://via.placeholder.com/300x200?text=Road+Bike" alt="Road Bike">
+                    <h3>Speed Demon 3000</h3>
+                    <p>Lightweight carbon road bike</p>
+                    <p class="price" data-price="2499.99">$<span class="price-value">2499.99</span></p>
+                    <button class="add-to-cart" onclick="addToCart(2, 'Speed Demon 3000', 2499.99)">Add to Cart</button>
+                </div>
+
+                <div class="bike-card" data-id="3">
+                    <img src="https://via.placeholder.com/300x200?text=City+Bike" alt="City Bike">
+                    <h3>Urban Cruiser</h3>
+                    <p>Comfortable city bike for daily commutes</p>
+                    <p class="price" data-price="599.99">$<span class="price-value">599.99</span></p>
+                    <button class="add-to-cart" onclick="addToCart(3, 'Urban Cruiser', 599.99)">Add to Cart</button>
+                </div>
+
+                <div class="bike-card" data-id="4">
+                    <img src="https://via.placeholder.com/300x200?text=Electric+Bike" alt="Electric Bike">
+                    <h3>E-Power 500</h3>
+                    <p>Electric bike with 50-mile range</p>
+                    <p class="price" data-price="3299.99">$<span class="price-value">3299.99</span></p>
+                    <button class="add-to-cart" onclick="addToCart(4, 'E-Power 500', 3299.99)">Add to Cart</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="cart">
+            <h2>Shopping Cart</h2>
+            <div id="cart-items"></div>
+            <div class="cart-total">
+                <h3>Total: $<span id="cart-total">0.00</span></h3>
+                <button class="checkout-btn" onclick="checkout()">Checkout</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Mike's Bike Shop. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
