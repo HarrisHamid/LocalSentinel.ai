@@ -184,93 +184,6 @@ Include confidence levels for complex findings"""
             print(f"Error reading file '{file_path}': {e}")
             sys.exit(1)
 
-    def get_hardcoded_example(self) -> str:
-        """Return hardcoded example content for testing"""
-        return """Project Path: webviews
-
-Source Tree:
-
-```txt
-webviews
-├── dashboard.html
-└── webview.html
-```
-
-`dashboard.html`:
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LocalSentinel.ai Dashboard</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
-            background-color: var(--vscode-sideBar-background);
-            color: var(--vscode-foreground);
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            padding: 16px;
-            overflow-y: auto;
-        }
-        
-        .dashboard-container {
-            max-width: 100%;
-            animation: fadeIn 0.6s ease-out;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--vscode-widget-border);
-        }
-    </style>
-</head>
-<body>
-    <div class="dashboard-container">
-        <div class="header">
-            <div class="header-left">
-                <div class="logo-small">
-                    <img src="${logoUri}" alt="LocalSentinel.ai" />
-                </div>
-                <h1 style="font-size: 16px; font-weight: 400;">LocalSentinel.ai</h1>
-            </div>
-        </div>
-    </div>
-    <script>
-        const vscode = acquireVsCodeApi();
-        
-        function doFullScan() {
-            vscode.postMessage({
-                command: 'doFullScan'
-            });
-        }
-        
-        window.addEventListener('message', event => {
-            const message = event.data;
-            console.log('Received message:', message); // Potential data exposure
-        });
-    </script>
-</body>
-</html>
-```"""
 
     def create_audit_prompt(self, code_content: str) -> str:
         """Combine the audit framework with code content"""
@@ -300,6 +213,7 @@ Please provide your response in the following JSON format:
                     "issue": "Issue title",
                     "description": "Detailed description of the vulnerability",
                     "immediate_actions": "Specific actions to take immediately to fix this issue",
+                    "how_to_fix": "Step-by-step instructions to remediate this vulnerability",
                     "code_snippet": "Relevant code if applicable"
                 }}
             ]
@@ -312,7 +226,8 @@ Please provide your response in the following JSON format:
                     "line": line_number,
                     "issue": "Issue title",
                     "description": "Detailed description of the vulnerability",
-                    "remediation": "Steps to address this issue"
+                    "remediation": "Steps to address this issue",
+                    "how_to_fix": "Step-by-step instructions to remediate this vulnerability"
                 }}
             ]
         }}
@@ -328,7 +243,13 @@ Please provide your response in the following JSON format:
     }}
 }}
 
-Focus on security vulnerabilities, exposed secrets, injection risks, and insecure practices. Return ONLY valid JSON, no additional text."""
+Focus on:
+1. Security vulnerabilities, exposed secrets, injection risks, and insecure practices
+2. Logic errors - code that may technically work but doesn't make sense in the program's context
+3. Business logic flaws - implementations that could lead to unintended behavior
+4. Context-specific issues - code that might be secure in isolation but problematic in this specific application
+
+Return ONLY valid JSON, no additional text."""
         
         return prompt
 
@@ -413,8 +334,8 @@ Focus on security vulnerabilities, exposed secrets, injection risks, and insecur
         except Exception as e:
             print(f"Error saving results: {e}")
 
-    def run_audit(self, code_source: str = "hardcoded", file_path: str = "report_example.md", 
-                  output_file: str = "security_audit_report.json", lm_studio_url: Optional[str] = None) -> None:
+    def run_audit(self, file_path: str, output_file: str = "security_audit_report.json", 
+                  lm_studio_url: Optional[str] = None) -> None:
         """Run the complete security audit process"""
         
         # Update LM Studio URL if provided
@@ -425,13 +346,9 @@ Focus on security vulnerabilities, exposed secrets, injection risks, and insecur
         print("🛡️  Security Audit Framework - LM Studio Client")
         print("=" * 60)
         
-        # Get code content
-        if code_source == "file":
-            print(f"Reading code from file: {file_path}")
-            code_content = self.read_code_file(file_path)
-        else:
-            print("Using hardcoded example content")
-            code_content = self.get_hardcoded_example()
+        # Get code content from file
+        print(f"Reading code from file: {file_path}")
+        code_content = self.read_code_file(file_path)
         
         # Create audit prompt
         print("Creating audit prompt with framework...")
@@ -475,24 +392,19 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser(description="Security Audit using LM Studio")
-    parser.add_argument("--file", "-f", help="Path to code file to audit")
+    parser.add_argument("file", help="Path to markdown file containing code summary to audit")
     parser.add_argument("--output", "-o", default="security_audit_report.json", 
                        help="Output file for audit report (JSON format)")
     parser.add_argument("--url", "-u", default="http://127.0.0.1:1234/v1/chat/completions",
                        help="LM Studio API URL")
-    parser.add_argument("--hardcoded", action="store_true", 
-                       help="Use hardcoded example instead of file")
     
     args = parser.parse_args()
     
     # Create client
     client = SecurityAuditClient(args.url)
     
-    # Determine source
-    if args.file and not args.hardcoded:
-        client.run_audit("file", args.file, args.output, args.url)
-    else:
-        client.run_audit("hardcoded", output_file=args.output, lm_studio_url=args.url)
+    # Run audit with the provided file
+    client.run_audit(args.file, args.output, args.url)
 
 if __name__ == "__main__":
     main()
