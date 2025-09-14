@@ -62,26 +62,65 @@ class LocalSentinalWebviewProvider {
           break;
 
         case "doFullScan":
-          try {
-            const workspaceFolders = vscode.workspace.workspaceFolders;
-            const workspacePath = workspaceFolders && workspaceFolders[0] 
-              ? workspaceFolders[0].uri.fsPath 
-              : null;
-            
-            const targetPath = this.selectedFolder 
-              ? path.join(workspacePath, this.selectedFolder)
-              : workspacePath;
-            
-            vscode.window.showInformationMessage(`🔍 Scanning folder: ${targetPath || 'No folder selected'}`);
-            
-            // TODO: Implement actual scan functionality with targetPath
-            
-            // For now, just log the path
-            console.log("Scan target path:", targetPath);
-            
-          } catch (error) {
-            vscode.window.showErrorMessage(`Failed to perform scan: ${error.message}`);
-          }
+          (async () => {
+            try {
+              const workspaceFolders = vscode.workspace.workspaceFolders;
+              const workspacePath = workspaceFolders && workspaceFolders[0] 
+                ? workspaceFolders[0].uri.fsPath 
+                : null;
+              
+              if (!workspacePath) {
+                vscode.window.showErrorMessage("No workspace folder is open");
+                return;
+              }
+              
+              const targetPath = this.selectedFolder 
+                ? path.join(workspacePath, this.selectedFolder)
+                : workspacePath;
+              
+              // Get the folder name for output file
+              const folderName = this.selectedFolder 
+                ? path.basename(this.selectedFolder)
+                : path.basename(workspacePath);
+              
+              // Create output directory if it doesn't exist
+              const outputDir = path.join(workspacePath, 'LocalSentinel.ai');
+              if (!fs.existsSync(outputDir)) {
+                fs.mkdirSync(outputDir, { recursive: true });
+              }
+              
+              // Build the command
+              const outputPath = path.join(outputDir, `${folderName}.md`);
+              const command = `code2prompt --path "${targetPath}" --output "${outputPath}"`;
+              
+              vscode.window.showInformationMessage(`🔍 Scanning folder: ${targetPath}`);
+              console.log("Running command:", command);
+              
+              // Execute the command
+              exec(command, { cwd: workspacePath }, (error, stdout, stderr) => {
+                if (error) {
+                  console.error("Command error:", error);
+                  vscode.window.showErrorMessage(`❌ Scan failed: ${error.message}`);
+                  return;
+                }
+                
+                if (stderr) {
+                  console.warn("Command stderr:", stderr);
+                }
+                
+                console.log("Command output:", stdout);
+                vscode.window.showInformationMessage(`✅ Scan completed! Output saved to: ${outputPath}`);
+                
+                // Optionally open the generated file
+                vscode.workspace.openTextDocument(outputPath).then(doc => {
+                  vscode.window.showTextDocument(doc);
+                });
+              });
+              
+            } catch (error) {
+              vscode.window.showErrorMessage(`Failed to perform scan: ${error.message}`);
+            }
+          })();
           break;
 
         case "stopServer":
