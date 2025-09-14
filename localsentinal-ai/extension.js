@@ -17,8 +17,8 @@ class LocalSentinalWebviewProvider {
     webviewView.webview.options = {
       enableScripts: true,
       localResourceRoots: [
-        vscode.Uri.file(path.join(this._context.extensionPath, 'assets')),
-        vscode.Uri.file(path.join(this._context.extensionPath, 'webviews'))
+        vscode.Uri.file(path.join(this._context.extensionPath, "assets")),
+        vscode.Uri.file(path.join(this._context.extensionPath, "webviews")),
       ],
     };
 
@@ -65,9 +65,10 @@ class LocalSentinalWebviewProvider {
           (async () => {
             try {
               const workspaceFolders = vscode.workspace.workspaceFolders;
-              const workspacePath = workspaceFolders && workspaceFolders[0]
-                ? workspaceFolders[0].uri.fsPath
-                : null;
+              const workspacePath =
+                workspaceFolders && workspaceFolders[0]
+                  ? workspaceFolders[0].uri.fsPath
+                  : null;
 
               if (!workspacePath) {
                 vscode.window.showErrorMessage("No workspace folder is open");
@@ -78,16 +79,20 @@ class LocalSentinalWebviewProvider {
               const targetFolder = this.selectedFolder || ".";
 
               // Build the command using the specified format
-              const command = `code2prompt ${targetFolder} --output "setup.md" --tokens`;
+              const command = `code2prompt ${targetFolder} --output-file "setup.md" --tokens`;
 
-              vscode.window.showInformationMessage(`🔍 Scanning folder: ${targetFolder}`);
+              vscode.window.showInformationMessage(
+                `🔍 Scanning folder: ${targetFolder}`
+              );
               console.log("Running command:", command);
 
               // Execute the command
               exec(command, { cwd: workspacePath }, (error, stdout, stderr) => {
                 if (error) {
                   console.error("Command error:", error);
-                  vscode.window.showErrorMessage(`❌ Scan failed: ${error.message}`);
+                  vscode.window.showErrorMessage(
+                    `❌ Scan failed: ${error.message}`
+                  );
                   return;
                 }
 
@@ -97,16 +102,19 @@ class LocalSentinalWebviewProvider {
 
                 console.log("Command output:", stdout);
                 const outputPath = path.join(workspacePath, "setup.md");
-                vscode.window.showInformationMessage(`✅ Scan completed! Output saved to: ${outputPath}`);
+                vscode.window.showInformationMessage(
+                  `✅ Scan completed! Output saved to: ${outputPath}`
+                );
 
                 // Optionally open the generated file
-                vscode.workspace.openTextDocument(outputPath).then(doc => {
+                vscode.workspace.openTextDocument(outputPath).then((doc) => {
                   vscode.window.showTextDocument(doc);
                 });
               });
-
             } catch (error) {
-              vscode.window.showErrorMessage(`Failed to perform scan: ${error.message}`);
+              vscode.window.showErrorMessage(
+                `Failed to perform scan: ${error.message}`
+              );
             }
           })();
           break;
@@ -114,14 +122,20 @@ class LocalSentinalWebviewProvider {
         case "stopServer":
           (async () => {
             try {
-              vscode.window.showInformationMessage("🛑 Stopping LocalSentinel.ai server...");
+              vscode.window.showInformationMessage(
+                "🛑 Stopping LocalSentinel.ai server..."
+              );
               await stopServer();
               this.serverRunning = false;
               this.serverPort = null;
               this.switchToWelcome();
-              vscode.window.showInformationMessage("✅ Server stopped successfully");
+              vscode.window.showInformationMessage(
+                "✅ Server stopped successfully"
+              );
             } catch (error) {
-              vscode.window.showErrorMessage(`❌ Failed to stop server: ${error.message}`);
+              vscode.window.showErrorMessage(
+                `❌ Failed to stop server: ${error.message}`
+              );
             }
           })();
           break;
@@ -134,30 +148,34 @@ class LocalSentinalWebviewProvider {
                 vscode.window.showErrorMessage("No workspace folder is open");
                 return;
               }
-              
+
               const workspaceRoot = workspaceFolders[0].uri;
               const selectedUri = await vscode.window.showOpenDialog({
                 canSelectFolders: true,
                 canSelectFiles: false,
                 canSelectMany: false,
                 defaultUri: workspaceRoot,
-                openLabel: "Select Scan Folder"
+                openLabel: "Select Scan Folder",
               });
-              
+
               if (selectedUri && selectedUri[0]) {
-                const relativePath = vscode.workspace.asRelativePath(selectedUri[0]);
+                const relativePath = vscode.workspace.asRelativePath(
+                  selectedUri[0]
+                );
                 this.selectedFolder = relativePath;
-                
+
                 // Send update to webview
                 if (this._view) {
                   this._view.webview.postMessage({
-                    command: 'folderSelected',
-                    folderPath: relativePath
+                    command: "folderSelected",
+                    folderPath: relativePath,
                   });
                 }
               }
             } catch (error) {
-              vscode.window.showErrorMessage(`Failed to select folder: ${error.message}`);
+              vscode.window.showErrorMessage(
+                `Failed to select folder: ${error.message}`
+              );
             }
           })();
           break;
@@ -165,49 +183,64 @@ class LocalSentinalWebviewProvider {
     });
   }
 
-  getWebviewContent(webview, view = 'welcome') {
-    const htmlFile = view === 'dashboard' ? 'dashboard.html' : 'webview.html';
-    const htmlPath = path.join(this._context.extensionPath, 'webviews', htmlFile);
-    let html = fs.readFileSync(htmlPath, 'utf8');
-    
+  getWebviewContent(webview, view = "welcome") {
+    const htmlFile = view === "dashboard" ? "dashboard.html" : "webview.html";
+    const htmlPath = path.join(
+      this._context.extensionPath,
+      "webviews",
+      htmlFile
+    );
+    let html = fs.readFileSync(htmlPath, "utf8");
+
     // Get the URI for the logo
     const logoUri = webview.asWebviewUri(
-      vscode.Uri.file(path.join(this._context.extensionPath, 'assets', 'logo_white.svg'))
+      vscode.Uri.file(
+        path.join(this._context.extensionPath, "assets", "logo_white.svg")
+      )
     );
-    
+
     // Replace the placeholder with the actual URI
-    html = html.replace('${logoUri}', logoUri);
-    
+    html = html.replace("${logoUri}", logoUri);
+
     // Replace server port and project path if in dashboard view
-    if (view === 'dashboard' && this.serverPort) {
-      html = html.replace('${serverPort}', this.serverPort);
-      
+    if (view === "dashboard" && this.serverPort) {
+      html = html.replace("${serverPort}", this.serverPort);
+
       // Get current workspace folder
       const workspaceFolders = vscode.workspace.workspaceFolders;
-      const projectPath = workspaceFolders && workspaceFolders[0] 
-        ? workspaceFolders[0].name 
-        : 'No active workspace';
-      html = html.replace('${projectPath}', projectPath);
-      
+      const projectPath =
+        workspaceFolders && workspaceFolders[0]
+          ? workspaceFolders[0].name
+          : "No active workspace";
+      html = html.replace("${projectPath}", projectPath);
+
       // Set initial selected folder (workspace root by default)
-      const selectedFolder = this.selectedFolder || (workspaceFolders && workspaceFolders[0] 
-        ? workspaceFolders[0].name 
-        : 'Select folder...');
-      html = html.replace('${selectedFolder}', selectedFolder);
+      const selectedFolder =
+        this.selectedFolder ||
+        (workspaceFolders && workspaceFolders[0]
+          ? workspaceFolders[0].name
+          : "Select folder...");
+      html = html.replace("${selectedFolder}", selectedFolder);
     }
-    
+
     return html;
   }
 
   switchToDashboard() {
     if (this._view) {
-      this._view.webview.html = this.getWebviewContent(this._view.webview, 'dashboard');
+      this._view.webview.html = this.getWebviewContent(
+        this._view.webview,
+        "dashboard"
+      );
     }
   }
 
   switchToWelcome() {
     if (this._view) {
-      this._view.webview.html = this.getWebviewContent(this._view.webview, 'welcome');
+      this._view.webview.html = this.getWebviewContent(
+        this._view.webview,
+        "welcome"
+      );
     }
   }
 }
@@ -220,19 +253,21 @@ async function startServer() {
       const output = stderr.trim();
 
       // Parse the output lines
-      const lines = output.split('\n');
-      
+      const lines = output.split("\n");
+
       // Look for the success pattern in the output
       let portNumber = null;
       let hasStartingMessage = false;
-      
+
       for (const line of lines) {
         if (line.includes("Starting server...")) {
           hasStartingMessage = true;
         }
-        
+
         // Check for success message and extract port
-        const portMatch = line.match(/Success! Server is now running on port (\d+)/);
+        const portMatch = line.match(
+          /Success! Server is now running on port (\d+)/
+        );
         if (portMatch && portMatch[1]) {
           portNumber = portMatch[1];
         }
@@ -261,22 +296,26 @@ async function stopServer() {
     exec("lms server stop", (error, stdout, stderr) => {
       // The lms command might output to stderr or stdout
       const output = (stderr + stdout).trim();
-      
+
       console.log("Stop server output:", output);
       console.log("Stop server error:", error);
 
       // Check for successful stop patterns or no error
-      if (output.includes("Server stopped") || 
-          output.includes("stopped successfully") || 
-          output.includes("stopped") ||
-          !error ||
-          (error && error.code === 0)) {
+      if (
+        output.includes("Server stopped") ||
+        output.includes("stopped successfully") ||
+        output.includes("stopped") ||
+        !error ||
+        (error && error.code === 0)
+      ) {
         resolve({
           success: true,
           output: output,
         });
       } else if (error) {
-        reject(new Error(`Command failed: ${error.message}. Output: ${output}`));
+        reject(
+          new Error(`Command failed: ${error.message}. Output: ${output}`)
+        );
       } else {
         reject(new Error(`Failed to stop server. Output: ${output}`));
       }
