@@ -40,4 +40,18 @@ AI-accelerated coding ships features faster than security and compliance can rev
 - **Azhar Pathan**: apathan4@stevens.edu  
 - **Emran Nasseri**: enasseri@stevens.edu
 
+## Required Technologies
+- Python 3.12
+- Rust
+- Cargo
+- Node.js
+
+## Installation Guide
+- Download LM Studio
+  - Download a model (we use deepseak)
+  - Go to the Developer section
+  - Load in the Model
+  - Go to settings and enable headless version
+- Download binaries for code2prompt
+  
 ---
