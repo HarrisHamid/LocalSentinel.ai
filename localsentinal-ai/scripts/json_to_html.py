@@ -39,90 +39,197 @@ def json_to_html(json_file_path, output_html_path):
         print(f"Error: Invalid JSON format - {e}")
         return
 
-    # Start building HTML
+    # Start building HTML with terminal styling
     output_html = '''<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Security Report Data</title>
+    <title>LocalSentinel Terminal - Security Report</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
             line-height: 1.6;
-            margin: 40px;
-            background-color: #f5f5f5;
-            color: #333;
+            margin: 0;
+            background: linear-gradient(135deg, #1a2332 0%, #2d3748 100%);
+            color: #e2e8f0;
+            font-size: 14px;
+            min-height: 100vh;
+            padding: 20px;
         }
-        .container {
+        .terminal-window {
             max-width: 1000px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 20px auto;
+            background: #1a202c;
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            overflow: hidden;
+            border: 1px solid #2d3748;
         }
-        h1 {
-            color: #2c3e50;
-            border-bottom: 3px solid #3498db;
-            padding-bottom: 10px;
+        .terminal-header {
+            background: #2d3748;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #4a5568;
+        }
+        .traffic-lights {
+            display: flex;
+            gap: 8px;
+            margin-right: 15px;
+        }
+        .light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .light.red { background: #ff5f56; }
+        .light.yellow { background: #ffbd2e; }
+        .light.green { background: #27ca3f; }
+        .terminal-title {
+            color: #a0aec0;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .terminal-content {
+            padding: 24px;
+            background: #1a202c;
+        }
+        .command-line {
+            color: #48bb78;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        .command-line::before {
+            content: "$ ";
+            color: #68d391;
         }
         ul, ol {
             margin: 10px 0;
             padding-left: 25px;
+            color: #cbd5e0;
         }
         li {
             margin: 8px 0;
             padding: 5px 0;
+            color: #e2e8f0;
         }
         strong {
-            color: #2980b9;
+            color: #90cdf4;
             font-weight: 600;
         }
         .top-level {
-            background: #ecf0f1;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 5px;
-            border-left: 4px solid #3498db;
+            background: rgba(45, 55, 72, 0.3);
+            padding: 20px;
+            margin: 16px 0;
+            border-radius: 8px;
+            border-left: 4px solid #4299e1;
         }
         .vulnerability-critical {
-            border-left-color: #e74c3c;
-            background: #fdf2f2;
+            border-left-color: #f56565;
+            background: rgba(245, 101, 101, 0.1);
         }
         .vulnerability-moderate {
-            border-left-color: #f39c12;
-            background: #fef9e7;
+            border-left-color: #ed8936;
+            background: rgba(237, 137, 54, 0.1);
         }
         .secure-implementation {
-            border-left-color: #27ae60;
-            background: #eafaf1;
+            border-left-color: #48bb78;
+            background: rgba(72, 187, 120, 0.1);
+        }
+        .section-title {
+            color: #f7fafc;
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .vulnerability-detail {
+            background: rgba(26, 32, 44, 0.8);
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 6px;
+            border: 1px solid #2d3748;
+        }
+        .file-ref {
+            color: #90cdf4;
+        }
+        .line-ref {
+            color: #f687b3;
+        }
+        .summary-info {
+            color: #a0aec0;
+            font-size: 13px;
+            margin: 4px 0;
+        }
+        .blink {
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        .scan-result {
+            margin: 16px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #68d391;
+        }
+        .icon {
+            font-size: 16px;
+            width: 20px;
+        }
+        .data-structure {
+            color: #cbd5e0;
+            margin-top: 24px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Security Report Data Structure</h1>
-        <div class="data-content">
+    <div class="terminal-window">
+        <div class="terminal-header">
+            <div class="traffic-lights">
+                <div class="light red"></div>
+                <div class="light yellow"></div>
+                <div class="light green"></div>
+            </div>
+            <div class="terminal-title">LocalSentinel Terminal - Security Report</div>
+        </div>
+        <div class="terminal-content">
+            <div class="command-line">localsentinel generate-report --format=html</div>
+            
+            <div class="scan-result">
+                <span class="icon">✓</span>
+                <span>Report generated successfully</span>
+            </div>
+            
+            <div class="data-structure">
 '''
 
     # Process each top-level key-value pair
     for key, value in data.items():
         # Add special styling based on key names
         css_class = "top-level"
-        if "critical" in key.lower():
+        if "critical" in key.lower() or "vulnerabilities" in key.lower():
             css_class += " vulnerability-critical"
         elif "moderate" in key.lower():
             css_class += " vulnerability-moderate"
         elif "secure" in key.lower():
             css_class += " secure-implementation"
 
-        output_html += f'        <div class="{css_class}">\n'
-        output_html += f'            <strong style="font-size: 1.2em;">{key}</strong>: {format_value(value, 3)}\n'
-        output_html += f'        </div>\n'
+        output_html += f'            <div class="{css_class}">\n'
+        output_html += f'                <div class="section-title">{key}</div>\n'
+        output_html += f'                <div>{format_value(value, 4)}</div>\n'
+        output_html += f'            </div>\n'
 
-    # Close HTML
-    output_html += '''        </div>
+    # Close HTML with terminal footer
+    output_html += '''            </div>
+            
+            <div style="margin-top: 24px; color: #4a5568; display: flex; align-items: center; gap: 8px;">
+                <span>Report complete</span>
+                <span class="blink">█</span>
+            </div>
+        </div>
     </div>
 </body>
 </html>'''
