@@ -19,10 +19,8 @@ AI-accelerated coding ships features faster than security and compliance can rev
 ---
 
 ## 🛠️ What We Built (Hackathon MVP)
-- ✅ **Windows app (.EXE/.MSIX) + CLI** to scan repos fully offline
-- ✅ **Rule runners** (Semgrep, Bandit, secrets, CVE snapshot) → unified JSON
-- ✅ **On-device SLM** ranks issues, explains impact, drafts patch diffs
-- ✅ **HTML/PDF Attestation Pack** with risk score, evidence links, timing, and NPU log
+- ✅ **Visual Studio Code Extension** to scan repos fully offline
+- ✅ **Security Report Output** with risk score, evidence links, and suggested fixes
 
 ---
 
