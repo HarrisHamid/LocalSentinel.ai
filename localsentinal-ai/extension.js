@@ -78,8 +78,19 @@ class LocalSentinalWebviewProvider {
               // Determine target folder relative to workspace
               const targetFolder = this.selectedFolder || ".";
 
+              // Create output directory if it doesn't exist
+              const outputDir = path.join(workspacePath, 'LocalSentinel.ai');
+              if (!fs.existsSync(outputDir)) {
+                fs.mkdirSync(outputDir, { recursive: true });
+              }
+
+              // Generate filename based on target folder
+              const folderName = targetFolder === "." ? "root" : targetFolder.replace(/[\/\\]/g, '-');
+              const outputFileName = `${folderName}-report.md`;
+              const outputPath = path.join(outputDir, outputFileName);
+
               // Build the command using the specified format
-              const command = `code2prompt ${targetFolder} --output-file "setup.md"`;
+              const command = `code2prompt ${targetFolder} --output-file "${outputPath}"`;
 
               vscode.window.showInformationMessage(
                 `🔍 Scanning folder: ${targetFolder}`
@@ -101,7 +112,6 @@ class LocalSentinalWebviewProvider {
                 }
 
                 console.log("Command output:", stdout);
-                const outputPath = path.join(workspacePath, "setup.md");
                 vscode.window.showInformationMessage(
                   `✅ Scan completed! Output saved to: ${outputPath}`
                 );
