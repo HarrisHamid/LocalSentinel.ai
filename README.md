@@ -35,7 +35,7 @@ AI-accelerated coding ships features faster than security and compliance can rev
 
 ## 👤 Team
 - **Harris Hamid**: hhamid@stevens.edu  
-- **Ivan Farfand Diaz**: ifarfand@stevens.edu  
+- **Ivan Farfan Diaz**: ifarfand@stevens.edu  
 - **Akbar Pathan**: apathan5@stevens.edu
 - **Azhar Pathan**: apathan4@stevens.edu  
 - **Emran Nasseri**: enasseri@stevens.edu
@@ -51,6 +51,7 @@ AI-accelerated coding ships features faster than security and compliance can rev
   - Go to the Developer section
   - Load in the Model
   - Go to settings and enable headless version
+  - Update context length to at leats 12000
 - Install Code2prompt (https://github.com/mufeedvh/code2prompt)
   
 ---
