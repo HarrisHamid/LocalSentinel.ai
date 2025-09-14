@@ -79,7 +79,7 @@ class LocalSentinalWebviewProvider {
               const targetFolder = this.selectedFolder || ".";
 
               // Build the command using the specified format
-              const command = `code2prompt ${targetFolder} --output-file "setup.md" --tokens`;
+              const command = `code2prompt ${targetFolder} --output-file "setup.md"`;
 
               vscode.window.showInformationMessage(
                 `🔍 Scanning folder: ${targetFolder}`
