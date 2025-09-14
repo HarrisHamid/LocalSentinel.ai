@@ -63,9 +63,22 @@ class LocalSentinalWebviewProvider {
 
         case "doFullScan":
           try {
-            vscode.window.showInformationMessage("🔍 Starting full security scan...");
-            // TODO: Implement actual scan functionality
-            vscode.window.showInformationMessage("Full scan completed successfully!");
+            const workspaceFolders = vscode.workspace.workspaceFolders;
+            const workspacePath = workspaceFolders && workspaceFolders[0] 
+              ? workspaceFolders[0].uri.fsPath 
+              : null;
+            
+            const targetPath = this.selectedFolder 
+              ? path.join(workspacePath, this.selectedFolder)
+              : workspacePath;
+            
+            vscode.window.showInformationMessage(`🔍 Scanning folder: ${targetPath || 'No folder selected'}`);
+            
+            // TODO: Implement actual scan functionality with targetPath
+            
+            // For now, just log the path
+            console.log("Scan target path:", targetPath);
+            
           } catch (error) {
             vscode.window.showErrorMessage(`Failed to perform scan: ${error.message}`);
           }
