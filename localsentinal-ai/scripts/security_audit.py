@@ -278,18 +278,57 @@ webviews
 
 {self.audit_framework}
 
-Now analyze this code and provide a complete security audit report following the framework above:
+Now analyze this code and provide a complete security audit report in JSON format following this structure:
 
 ```
 {code_content}
 ```
 
-Please provide:
-1. Executive Dashboard with security score
-2. Detailed Findings (RED → YELLOW → GREEN)
-3. Remediation Guide with specific steps
+Please provide your response in the following JSON format:
+{{
+    "project_name": "Project name extracted from the code or path",
+    "total_files": number_of_files_scanned,
+    "project_overview": "3-5 sentence summary covering project purpose, scope, and audit methodology",
+    "security_score": number_out_of_100,
+    "vulnerabilities": {{
+        "critical": {{
+            "count": number_of_critical_issues,
+            "items": [
+                {{
+                    "file": "file_path",
+                    "line": line_number,
+                    "issue": "Issue title",
+                    "description": "Detailed description of the vulnerability",
+                    "immediate_actions": "Specific actions to take immediately to fix this issue",
+                    "code_snippet": "Relevant code if applicable"
+                }}
+            ]
+        }},
+        "moderate": {{
+            "count": number_of_moderate_issues,
+            "items": [
+                {{
+                    "file": "file_path",
+                    "line": line_number,
+                    "issue": "Issue title",
+                    "description": "Detailed description of the vulnerability",
+                    "remediation": "Steps to address this issue"
+                }}
+            ]
+        }}
+    }},
+    "secure_implementations": {{
+        "count": number_of_secure_items,
+        "items": [
+            {{
+                "file": "file_path",
+                "description": "Brief description of what was done correctly"
+            }}
+        ]
+    }}
+}}
 
-Focus on security vulnerabilities, exposed secrets, injection risks, and insecure practices."""
+Focus on security vulnerabilities, exposed secrets, injection risks, and insecure practices. Return ONLY valid JSON, no additional text."""
         
         return prompt
 
@@ -339,17 +378,26 @@ Focus on security vulnerabilities, exposed secrets, injection risks, and insecur
             print(f"Error sending request: {e}")
             return None
 
-    def save_results(self, results: str, output_file: str = "security_audit_report.md") -> None:
+    def save_results(self, results: str, output_file: str = "security_audit_report.json") -> None:
         """Save audit results to file"""
         try:
-            with open(output_file, 'w', encoding='utf-8') as f:
-                f.write(results)
-            print(f"Audit report saved to: {output_file}")
+            # Try to parse and format JSON
+            try:
+                json_data = json.loads(results)
+                formatted_json = json.dumps(json_data, indent=2, ensure_ascii=False)
+                with open(output_file, 'w', encoding='utf-8') as f:
+                    f.write(formatted_json)
+                print(f"Audit report saved to: {output_file}")
+            except json.JSONDecodeError:
+                # If not valid JSON, save as is
+                with open(output_file, 'w', encoding='utf-8') as f:
+                    f.write(results)
+                print(f"Warning: Response was not valid JSON. Saved raw output to: {output_file}")
         except Exception as e:
             print(f"Error saving results: {e}")
 
     def run_audit(self, code_source: str = "hardcoded", file_path: str = "report_example.md", 
-                  output_file: str = "security_audit_report.md", lm_studio_url: Optional[str] = None) -> None:
+                  output_file: str = "security_audit_report.json", lm_studio_url: Optional[str] = None) -> None:
         """Run the complete security audit process"""
         
         # Update LM Studio URL if provided
@@ -385,7 +433,19 @@ Focus on security vulnerabilities, exposed secrets, injection risks, and insecur
             print("\n" + "=" * 60)
             print("📊 AUDIT RESULTS")
             print("=" * 60)
-            print(results)
+            
+            # Try to parse and display JSON summary
+            try:
+                json_data = json.loads(results)
+                print(f"Project: {json_data.get('project_name', 'Unknown')}")
+                print(f"Security Score: {json_data.get('security_score', 'N/A')}/100")
+                print(f"Total Files Scanned: {json_data.get('total_files', 0)}")
+                print(f"Critical Issues: {json_data.get('vulnerabilities', {}).get('critical', {}).get('count', 0)}")
+                print(f"Moderate Issues: {json_data.get('vulnerabilities', {}).get('moderate', {}).get('count', 0)}")
+                print(f"Secure Implementations: {json_data.get('secure_implementations', {}).get('count', 0)}")
+            except json.JSONDecodeError:
+                print("Warning: Could not parse JSON response")
+                print(results[:500] + "..." if len(results) > 500 else results)
             
             # Save results
             self.save_results(results, output_file)
@@ -399,8 +459,8 @@ def main():
     
     parser = argparse.ArgumentParser(description="Security Audit using LM Studio")
     parser.add_argument("--file", "-f", help="Path to code file to audit")
-    parser.add_argument("--output", "-o", default="security_audit_report.md", 
-                       help="Output file for audit report")
+    parser.add_argument("--output", "-o", default="security_audit_report.json", 
+                       help="Output file for audit report (JSON format)")
     parser.add_argument("--url", "-u", default="http://127.0.0.1:1234/v1/chat/completions",
                        help="LM Studio API URL")
     parser.add_argument("--hardcoded", action="store_true", 
