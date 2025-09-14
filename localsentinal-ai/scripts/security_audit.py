@@ -7,8 +7,13 @@ Sends code for security analysis using the comprehensive audit framework
 import json
 import requests
 import sys
+import io
 from pathlib import Path
 from typing import Dict, Any, Optional
+
+# Set UTF-8 encoding for stdout to handle emojis on Windows
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 class SecurityAuditClient:
     def __init__(self, lm_studio_url: str = "http://localhost:1234/v1/chat/completions"):
@@ -343,7 +348,7 @@ Return ONLY valid JSON, no additional text."""
             self.lm_studio_url = lm_studio_url
         
         print("=" * 60)
-        print("🛡️  Security Audit Framework - LM Studio Client")
+        print("Security Audit Framework - LM Studio Client")
         print("=" * 60)
         
         # Get code content from file
@@ -383,7 +388,7 @@ Return ONLY valid JSON, no additional text."""
         
         if results:
             print("\n" + "=" * 60)
-            print("📊 AUDIT RESULTS")
+            print("AUDIT RESULTS")
             print("=" * 60)
             
             # Try to parse and display JSON summary
