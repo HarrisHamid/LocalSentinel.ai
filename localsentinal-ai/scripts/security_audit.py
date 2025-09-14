@@ -362,7 +362,24 @@ Focus on security vulnerabilities, exposed secrets, injection risks, and insecur
             
             if response.status_code == 200:
                 data = response.json()
-                return data.get("choices", [{}])[0].get("message", {}).get("content", "")
+                content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+                
+                # Extract JSON from content if it's wrapped in markdown code blocks
+                if content:
+                    # Remove markdown code blocks if present
+                    if "```json" in content:
+                        start = content.find("```json") + 7
+                        end = content.rfind("```")
+                        if end > start:
+                            content = content[start:end].strip()
+                    elif "```" in content:
+                        # Handle generic code blocks
+                        start = content.find("```") + 3
+                        end = content.rfind("```")
+                        if end > start:
+                            content = content[start:end].strip()
+                
+                return content
             else:
                 print(f"Error: API returned status code {response.status_code}")
                 print(f"Response: {response.text}")
