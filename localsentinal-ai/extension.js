@@ -84,82 +84,91 @@ class LocalSentinalWebviewProvider {
                 fs.mkdirSync(outputDir, { recursive: true });
               }
 
-              // Generate filename based on target folder
+              // Generate filenames based on target folder
               const folderName = targetFolder === "." ? "root" : targetFolder.replace(/[\/\\]/g, '-');
-              const outputFileName = `${folderName}-report.md`;
-              const outputPath = path.join(outputDir, outputFileName);
-
-              // Build the command using the specified format
-              const command = `code2prompt ${targetFolder} --output-file "${outputPath}"`;
+              const mdOutputPath = path.join(outputDir, `${folderName}-report.md`);
 
               vscode.window.showInformationMessage(
-                `🔍 Scanning folder: ${targetFolder}`
+                `🔍 Starting security scan of: ${targetFolder}`
               );
-              console.log("Running command:", command);
 
-              // Execute the command
-              exec(command, { cwd: workspacePath }, (error, stdout, stderr) => {
+              // Step 1: Generate markdown report with code2prompt
+              const code2promptCommand = `code2prompt ${targetFolder} --output-file "${mdOutputPath}"`;
+              console.log("Running code2prompt command:", code2promptCommand);
+
+              exec(code2promptCommand, { cwd: workspacePath }, (error, stdout, stderr) => {
                 if (error) {
-                  console.error("Command error:", error);
+                  console.error("Code2prompt error:", error);
                   vscode.window.showErrorMessage(
-                    `❌ Scan failed: ${error.message}`
+                    `❌ Code analysis failed: ${error.message}`
                   );
                   return;
                 }
 
-                if (stderr) {
-                  console.warn("Command stderr:", stderr);
-                }
+                console.log("Code2prompt completed, starting security audit...");
 
-                console.log("Command output:", stdout);
-                vscode.window.showInformationMessage(
-                  `✅ Scan completed! Output saved to: ${outputPath}`
-                );
-                
-                // Run security audit on the generated markdown file
+                // Step 2: Run security audit on the generated markdown file
                 const pythonPath = process.platform === 'win32' ? 'python' : 'python3';
-                // The script is in the extension's directory, use this._context.extensionPath
                 const scriptPath = path.join(this._context.extensionPath, 'scripts', 'security_audit.py');
-                const auditCommand = `${pythonPath} "${scriptPath}" "${outputPath}"`;
-                
+                const auditCommand = `${pythonPath} "${scriptPath}" "${mdOutputPath}"`;
+
                 console.log("Running security audit:", auditCommand);
                 vscode.window.showInformationMessage(
                   `🔐 Running security audit...`
                 );
-                
+
                 exec(auditCommand, { cwd: workspacePath }, (auditError, auditStdout, auditStderr) => {
                   if (auditError) {
                     console.error("Security audit error:", auditError);
                     vscode.window.showWarningMessage(
                       `⚠️ Security audit failed: ${auditError.message}`
                     );
-                  } else {
-                    console.log("Security audit output:", auditStdout);
-                    
-                    // Determine the audit report filename
-                    const baseName = path.basename(outputPath, '.md');
-                    const auditReportPath = path.join(outputDir, `${baseName}_audit_report.json`);
-                    
-                    vscode.window.showInformationMessage(
-                      `✅ Security audit completed! Report saved to: ${auditReportPath}`
-                    );
-                    
-                    // Open the audit report
-                    vscode.workspace.openTextDocument(auditReportPath).then((auditDoc) => {
-                      vscode.window.showTextDocument(auditDoc, { viewColumn: vscode.ViewColumn.Beside });
-                    }).catch((err) => {
-                      console.warn("Could not open audit report:", err);
+                    // Still open the markdown file even if audit failed
+                    vscode.workspace.openTextDocument(mdOutputPath).then((doc) => {
+                      vscode.window.showTextDocument(doc);
                     });
+                    return;
                   }
-                  
-                  if (auditStderr) {
-                    console.warn("Security audit stderr:", auditStderr);
-                  }
-                });
 
-                // Open the generated markdown file
-                vscode.workspace.openTextDocument(outputPath).then((doc) => {
-                  vscode.window.showTextDocument(doc);
+                  console.log("Security audit completed, generating HTML report...");
+
+                  // Determine the audit report filename (generated by security_audit.py)
+                  const baseName = path.basename(mdOutputPath, '.md');
+                  const auditReportPath = path.join(outputDir, `${baseName}_audit_report.json`);
+
+                  // Step 3: Generate HTML report from JSON
+                  const htmlScript = path.join(this._context.extensionPath, 'scripts', 'json_to_html.py');
+                  const htmlCommand = `${pythonPath} "${htmlScript}" "${auditReportPath}"`;
+
+                  console.log("Running HTML generation command:", htmlCommand);
+
+                  exec(htmlCommand, { cwd: workspacePath }, (htmlError, htmlStdout, htmlStderr) => {
+                    // Determine the HTML report path
+                    const htmlReportName = path.basename(auditReportPath, '.json') + '_report.html';
+                    const htmlReportPath = path.join(workspacePath, 'report_html', htmlReportName);
+
+                    if (htmlError) {
+                      console.error("HTML generation error:", htmlError);
+                      vscode.window.showWarningMessage(
+                        `⚠️ HTML report generation failed, but JSON report was created: ${auditReportPath}`
+                      );
+                    } else {
+                      // Success - all steps completed
+                      vscode.window.showInformationMessage(
+                        `✅ Security scan completed! Reports generated:\n📄 Markdown: ${mdOutputPath}\n📊 JSON: ${auditReportPath}\n🌐 HTML: ${htmlReportPath}`
+                      );
+
+                      // Open the HTML report if it exists
+                      if (fs.existsSync(htmlReportPath)) {
+                        vscode.env.openExternal(vscode.Uri.file(htmlReportPath));
+                      }
+                    }
+
+                    // Open the markdown file
+                    vscode.workspace.openTextDocument(mdOutputPath).then((doc) => {
+                      vscode.window.showTextDocument(doc);
+                    });
+                  });
                 });
               });
             } catch (error) {

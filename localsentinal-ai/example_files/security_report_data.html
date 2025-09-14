@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Report Data</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 40px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        ul, ol {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+        li {
+            margin: 8px 0;
+            padding: 5px 0;
+        }
+        strong {
+            color: #2980b9;
+            font-weight: 600;
+        }
+        .top-level {
+            background: #ecf0f1;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+        .vulnerability-critical {
+            border-left-color: #e74c3c;
+            background: #fdf2f2;
+        }
+        .vulnerability-moderate {
+            border-left-color: #f39c12;
+            background: #fef9e7;
+        }
+        .secure-implementation {
+            border-left-color: #27ae60;
+            background: #eafaf1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Security Report Data Structure</h1>
+        <div class="data-content">
+        <div class="top-level">
+            <strong style="font-size: 1.2em;">project_name</strong>: LocalSentinel.ai
+        </div>
+        <div class="top-level">
+            <strong style="font-size: 1.2em;">total_files</strong>: 2
+        </div>
+        <div class="top-level">
+            <strong style="font-size: 1.2em;">project_overview</strong>: The project is a web-based dashboard for managing and monitoring local sentinel AI operations. The audit methodology involved static code analysis using predefined security guidelines.
+        </div>
+        <div class="top-level">
+            <strong style="font-size: 1.2em;">security_score</strong>: 85
+        </div>
+        <div class="top-level">
+            <strong style="font-size: 1.2em;">vulnerabilities</strong>: 
+      <ul>
+        <li><strong>critical</strong>: 
+          <ul>
+            <li><strong>count</strong>: 0</li>
+            <li><strong>items</strong>: []</li>
+          </ul></li>
+        <li><strong>moderate</strong>: 
+          <ul>
+            <li><strong>count</strong>: 2</li>
+            <li><strong>items</strong>: 
+              <ol>
+                <li>
+                  <ul>
+                    <li><strong>file</strong>: webviews/dashboard.html</li>
+                    <li><strong>line</strong>: 149</li>
+                    <li><strong>issue</strong>: Hardcoded AWS Key Usage</li>
+                    <li><strong>description</strong>: The code includes a hardcoded AWS key which poses a significant security risk.</li>
+                    <li><strong>remediation</strong>: Replace the hardcoded AWS key with environment variables or secure vault storage.</li>
+                    <li><strong>how_to_fix</strong>: Update line 149 to use an environment variable for AWS keys.</li>
+                  </ul></li>
+                <li>
+                  <ul>
+                    <li><strong>file</strong>: webviews/dashboard.html</li>
+                    <li><strong>line</strong>: 206</li>
+                    <li><strong>issue</strong>: Potential SQL Injection via String Concatenation</li>
+                    <li><strong>description</strong>: The code uses string concatenation to build SQL queries without proper sanitization, which could be exploited for SQL injection.</li>
+                    <li><strong>remediation</strong>: Use parameterized queries or an ORM library to prevent SQL injection attacks.</li>
+                    <li><strong>how_to_fix</strong>: Refactor the query construction in line 206 to use a database library that supports parameterizing inputs.</li>
+                  </ul></li>
+              </ol></li>
+          </ul></li>
+      </ul>
+        </div>
+        <div class="top-level secure-implementation">
+            <strong style="font-size: 1.2em;">secure_implementations</strong>: 
+      <ul>
+        <li><strong>count</strong>: 1</li>
+        <li><strong>items</strong>: 
+          <ol>
+            <li>
+              <ul>
+                <li><strong>file</strong>: webviews/dashboard.html</li>
+                <li><strong>description</strong>: The code uses HTTPS for all requests and includes a strict Content-Security-Policy to mitigate various web vulnerabilities.</li>
+              </ul></li>
+          </ol></li>
+      </ul>
+        </div>
+        </div>
+    </div>
+</body>
+</html>
