@@ -65,37 +65,24 @@ class LocalSentinalWebviewProvider {
           (async () => {
             try {
               const workspaceFolders = vscode.workspace.workspaceFolders;
-              const workspacePath = workspaceFolders && workspaceFolders[0] 
-                ? workspaceFolders[0].uri.fsPath 
+              const workspacePath = workspaceFolders && workspaceFolders[0]
+                ? workspaceFolders[0].uri.fsPath
                 : null;
-              
+
               if (!workspacePath) {
                 vscode.window.showErrorMessage("No workspace folder is open");
                 return;
               }
-              
-              const targetPath = this.selectedFolder 
-                ? path.join(workspacePath, this.selectedFolder)
-                : workspacePath;
-              
-              // Get the folder name for output file
-              const folderName = this.selectedFolder 
-                ? path.basename(this.selectedFolder)
-                : path.basename(workspacePath);
-              
-              // Create output directory if it doesn't exist
-              const outputDir = path.join(workspacePath, 'LocalSentinel.ai');
-              if (!fs.existsSync(outputDir)) {
-                fs.mkdirSync(outputDir, { recursive: true });
-              }
-              
-              // Build the command
-              const outputPath = path.join(outputDir, `${folderName}.md`);
-              const command = `code2prompt "${targetPath}" --output "${outputPath}"`;
-              
-              vscode.window.showInformationMessage(`🔍 Scanning folder: ${targetPath}`);
+
+              // Determine target folder relative to workspace
+              const targetFolder = this.selectedFolder || ".";
+
+              // Build the command using the specified format
+              const command = `code2prompt --path ./${targetFolder} --output "setup.md" --tokens`;
+
+              vscode.window.showInformationMessage(`🔍 Scanning folder: ${targetFolder}`);
               console.log("Running command:", command);
-              
+
               // Execute the command
               exec(command, { cwd: workspacePath }, (error, stdout, stderr) => {
                 if (error) {
@@ -103,20 +90,21 @@ class LocalSentinalWebviewProvider {
                   vscode.window.showErrorMessage(`❌ Scan failed: ${error.message}`);
                   return;
                 }
-                
+
                 if (stderr) {
                   console.warn("Command stderr:", stderr);
                 }
-                
+
                 console.log("Command output:", stdout);
+                const outputPath = path.join(workspacePath, "setup.md");
                 vscode.window.showInformationMessage(`✅ Scan completed! Output saved to: ${outputPath}`);
-                
+
                 // Optionally open the generated file
                 vscode.workspace.openTextDocument(outputPath).then(doc => {
                   vscode.window.showTextDocument(doc);
                 });
               });
-              
+
             } catch (error) {
               vscode.window.showErrorMessage(`Failed to perform scan: ${error.message}`);
             }
