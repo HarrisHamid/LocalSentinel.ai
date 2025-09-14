@@ -42,16 +42,15 @@ AI-accelerated coding ships features faster than security and compliance can rev
 
 ## Required Technologies
 - Python 3.12
-- Rust
-- Cargo
-- Node.js
+- Rust, Cargo
+- JavaScript, Node.js
 
 ## Installation Guide
-- Download LM Studio
-  - Download a model (we use deepseak)
+- Download LM Studio (https://lmstudio.ai/)
+  - Download a model (we used deepseak-coder-v2-lite-instruct)
   - Go to the Developer section
   - Load in the Model
   - Go to settings and enable headless version
-- Download binaries for code2prompt
+- Install Code2prompt (https://github.com/mufeedvh/code2prompt)
   
 ---
