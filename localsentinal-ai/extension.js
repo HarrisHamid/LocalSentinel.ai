@@ -118,7 +118,8 @@ class LocalSentinalWebviewProvider {
                 
                 // Run security audit on the generated markdown file
                 const pythonPath = process.platform === 'win32' ? 'python' : 'python3';
-                const scriptPath = path.join(workspacePath, 'scripts', 'security_audit.py');
+                // The script is in the extension's directory, use this._context.extensionPath
+                const scriptPath = path.join(this._context.extensionPath, 'scripts', 'security_audit.py');
                 const auditCommand = `${pythonPath} "${scriptPath}" "${outputPath}"`;
                 
                 console.log("Running security audit:", auditCommand);
