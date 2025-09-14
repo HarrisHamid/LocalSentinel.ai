@@ -334,7 +334,7 @@ Return ONLY valid JSON, no additional text."""
         except Exception as e:
             print(f"Error saving results: {e}")
 
-    def run_audit(self, file_path: str, output_file: str = "security_audit_report.json", 
+    def run_audit(self, file_path: str, output_file: str = None, 
                   lm_studio_url: Optional[str] = None) -> None:
         """Run the complete security audit process"""
         
@@ -349,6 +349,24 @@ Return ONLY valid JSON, no additional text."""
         # Get code content from file
         print(f"Reading code from file: {file_path}")
         code_content = self.read_code_file(file_path)
+        
+        # Generate output filename based on input file if not provided
+        if output_file is None:
+            # Extract the base name from the input file
+            base_name = Path(file_path).stem
+            # Find the LocalSentinel.ai folder
+            current_dir = Path(file_path).parent
+            while current_dir.name != "LocalSentinel.ai" and current_dir.parent != current_dir:
+                current_dir = current_dir.parent
+            
+            # If LocalSentinel.ai folder found, use it; otherwise use the same directory as input
+            if current_dir.name == "LocalSentinel.ai":
+                output_dir = current_dir
+            else:
+                output_dir = Path(file_path).parent
+            
+            # Create output filename with _audit_report.json suffix
+            output_file = str(output_dir / f"{base_name}_audit_report.json")
         
         # Create audit prompt
         print("Creating audit prompt with framework...")
@@ -393,8 +411,8 @@ def main():
     
     parser = argparse.ArgumentParser(description="Security Audit using LM Studio")
     parser.add_argument("file", help="Path to markdown file containing code summary to audit")
-    parser.add_argument("--output", "-o", default="security_audit_report.json", 
-                       help="Output file for audit report (JSON format)")
+    parser.add_argument("--output", "-o", default=None, 
+                       help="Output file for audit report (JSON format). If not specified, will use input filename with _audit_report.json suffix")
     parser.add_argument("--url", "-u", default="http://127.0.0.1:1234/v1/chat/completions",
                        help="LM Studio API URL")
     

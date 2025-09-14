@@ -115,8 +115,48 @@ class LocalSentinalWebviewProvider {
                 vscode.window.showInformationMessage(
                   `✅ Scan completed! Output saved to: ${outputPath}`
                 );
+                
+                // Run security audit on the generated markdown file
+                const pythonPath = process.platform === 'win32' ? 'python' : 'python3';
+                const scriptPath = path.join(workspacePath, 'scripts', 'security_audit.py');
+                const auditCommand = `${pythonPath} "${scriptPath}" "${outputPath}"`;
+                
+                console.log("Running security audit:", auditCommand);
+                vscode.window.showInformationMessage(
+                  `🔐 Running security audit...`
+                );
+                
+                exec(auditCommand, { cwd: workspacePath }, (auditError, auditStdout, auditStderr) => {
+                  if (auditError) {
+                    console.error("Security audit error:", auditError);
+                    vscode.window.showWarningMessage(
+                      `⚠️ Security audit failed: ${auditError.message}`
+                    );
+                  } else {
+                    console.log("Security audit output:", auditStdout);
+                    
+                    // Determine the audit report filename
+                    const baseName = path.basename(outputPath, '.md');
+                    const auditReportPath = path.join(outputDir, `${baseName}_audit_report.json`);
+                    
+                    vscode.window.showInformationMessage(
+                      `✅ Security audit completed! Report saved to: ${auditReportPath}`
+                    );
+                    
+                    // Open the audit report
+                    vscode.workspace.openTextDocument(auditReportPath).then((auditDoc) => {
+                      vscode.window.showTextDocument(auditDoc, { viewColumn: vscode.ViewColumn.Beside });
+                    }).catch((err) => {
+                      console.warn("Could not open audit report:", err);
+                    });
+                  }
+                  
+                  if (auditStderr) {
+                    console.warn("Security audit stderr:", auditStderr);
+                  }
+                });
 
-                // Optionally open the generated file
+                // Open the generated markdown file
                 vscode.workspace.openTextDocument(outputPath).then((doc) => {
                   vscode.window.showTextDocument(doc);
                 });
