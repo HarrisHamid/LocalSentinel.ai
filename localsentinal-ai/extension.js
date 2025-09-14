@@ -91,7 +91,7 @@ class LocalSentinalWebviewProvider {
               
               // Build the command
               const outputPath = path.join(outputDir, `${folderName}.md`);
-              const command = `code2prompt --path "${targetPath}" --output "${outputPath}"`;
+              const command = `code2prompt "${targetPath}" --output "${outputPath}"`;
               
               vscode.window.showInformationMessage(`🔍 Scanning folder: ${targetPath}`);
               console.log("Running command:", command);
