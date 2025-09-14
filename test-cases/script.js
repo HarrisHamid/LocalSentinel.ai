@@ -39,6 +39,10 @@ function removeFromCart(id) {
 function updateCartDisplay() {
     const cartItemsDiv = document.getElementById('cart-items');
     const cartTotalSpan = document.getElementById('cart-total');
+    const cartCountSpan = document.getElementById('cart-count');
+
+    // Update cart count in header
+    cartCountSpan.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
 
     if (cart.length === 0) {
         cartItemsDiv.innerHTML = '<p>Your cart is empty</p>';

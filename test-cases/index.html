@@ -4,12 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mike's Bike Shop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
-        <h1>Mike's Bike Shop</h1>
-        <p>Your trusted local bike store since 1995</p>
+        <div class="header-content">
+            <h1>🚴 Mike's Bike Shop</h1>
+            <p>Your trusted local bike store since 1995</p>
+            <div class="header-cart">
+                <span class="cart-icon">🛒 Cart (<span id="cart-count">0</span>)</span>
+            </div>
+        </div>
     </header>
 
     <main>
@@ -17,7 +25,7 @@
             <h2>Our Bikes</h2>
             <div class="bike-grid">
                 <div class="bike-card" data-id="1">
-                    <img src="https://via.placeholder.com/300x200?text=Mountain+Bike" alt="Mountain Bike">
+                    <img src="https://images.unsplash.com/photo-1544191696-102dbdaeeaa0?w=400&h=300&fit=crop" alt="Mountain Bike">
                     <h3>Mountain Master Pro</h3>
                     <p>Professional mountain bike for serious riders</p>
                     <p class="price" data-price="1299.99">$<span class="price-value" contenteditable="true">1299.99</span></p>
@@ -25,7 +33,7 @@
                 </div>
 
                 <div class="bike-card" data-id="2">
-                    <img src="https://via.placeholder.com/300x200?text=Road+Bike" alt="Road Bike">
+                    <img src="https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=400&h=300&fit=crop" alt="Road Bike">
                     <h3>Speed Demon 3000</h3>
                     <p>Lightweight carbon road bike</p>
                     <p class="price" data-price="2499.99">$<span class="price-value" contenteditable="true">2499.99</span></p>
@@ -33,7 +41,7 @@
                 </div>
 
                 <div class="bike-card" data-id="3">
-                    <img src="https://via.placeholder.com/300x200?text=City+Bike" alt="City Bike">
+                    <img src="https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=400&h=300&fit=crop" alt="City Bike">
                     <h3>Urban Cruiser</h3>
                     <p>Comfortable city bike for daily commutes</p>
                     <p class="price" data-price="599.99">$<span class="price-value" contenteditable="true">599.99</span></p>
@@ -41,7 +49,7 @@
                 </div>
 
                 <div class="bike-card" data-id="4">
-                    <img src="https://via.placeholder.com/300x200?text=Electric+Bike" alt="Electric Bike">
+                    <img src="https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=400&h=300&fit=crop" alt="Electric Bike">
                     <h3>E-Power 500</h3>
                     <p>Electric bike with 50-mile range</p>
                     <p class="price" data-price="3299.99">$<span class="price-value" contenteditable="true">3299.99</span></p>
