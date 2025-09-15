@@ -1,24 +1,30 @@
 import { Card, CardContent } from "./ui/card";
-import { FolderOpen, Search, Copy } from "lucide-react";
+import { Download, Cpu, Search, Shield } from "lucide-react";
 
 const steps = [
   {
-    icon: FolderOpen,
-    title: "Select Your Project",
-    description: "Point LocalSentinel to your codebase by entering the file path. It works with any programming language.",
+    icon: Download,
+    title: "Install Extension",
+    description: "Download the VS Code extension from our GitHub releases. Simple .vsix file installation, no complex setup.",
     step: "01"
   },
   {
-    icon: Search,
-    title: "Run Compliance Check",
-    description: "Click 'Compliance Check' and let the AI analyze your code locally for security vulnerabilities and compliance issues.",
+    icon: Cpu,
+    title: "Start Local AI",
+    description: "Launch LM Studio with a security-focused model. Everything runs on your machine, no cloud required.",
     step: "02"
   },
   {
-    icon: Copy,
-    title: "Get Actionable Results",
-    description: "Review human-readable recommendations and copy the results to implement fixes in your preferred IDE.",
+    icon: Search,
+    title: "Scan Your Code",
+    description: "Click scan in VS Code. LocalSentinel analyzes your entire codebase for vulnerabilities in seconds.",
     step: "03"
+  },
+  {
+    icon: Shield,
+    title: "Review & Fix",
+    description: "Get a detailed report with RED/YELLOW/GREEN severity levels and copy-paste fixes for each issue.",
+    step: "04"
   }
 ];
 
@@ -36,7 +42,7 @@ export function HowItWorksSection() {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-4 gap-6">
           {steps.map((step, index) => (
             <div key={index} className="relative">
               <Card className="h-full border-2 hover:border-blue-300 dark:hover:border-blue-700 transition-colors">

@@ -3,6 +3,7 @@ import { AnimatedHeader } from "./components/AnimatedHeader";
 import { AnimatedHeroSection } from "./components/AnimatedHeroSection";
 import { AnimatedFeaturesSection } from "./components/AnimatedFeaturesSection";
 import { HowItWorksSection } from "./components/HowItWorksSection";
+import { VulnerabilityCategories } from "./components/VulnerabilityCategories";
 import { AnimatedTechSpecsSection } from "./components/AnimatedTechSpecsSection";
 import { AnimatedCTASection } from "./components/AnimatedCTASection";
 import { Footer } from "./components/Footer";
@@ -27,6 +28,7 @@ export default function App() {
       <div id="how-it-works">
         <HowItWorksSection />
       </div>
+      <VulnerabilityCategories />
       <AnimatedTechSpecsSection />
       <AnimatedCTASection />
       <Footer />

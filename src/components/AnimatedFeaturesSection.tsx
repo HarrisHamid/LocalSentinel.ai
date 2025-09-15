@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Shield, Cpu, FileCode, Download, Zap, Lock } from "lucide-react";
+import { Shield, Cpu, FileCode, Download, Zap, Lock, Bot } from "lucide-react";
 
 const features = [
   {
@@ -12,6 +12,13 @@ const features = [
     color: "from-green-500 to-emerald-500"
   },
   {
+    icon: Bot,
+    title: "AI Pair-Programming Ready",
+    description: "Copy fix prompts directly to Claude Code or Cursor for instant remediation.",
+    highlight: "AI-READY",
+    color: "from-purple-500 to-pink-500"
+  },
+  {
     icon: Cpu,
     title: "Snapdragon NPU",
     description: "Leverages Qualcomm QNN for 10x faster inference than CPU.",
@@ -20,17 +27,10 @@ const features = [
   },
   {
     icon: FileCode,
-    title: "IBM Granite 8B",
-    description: "State-of-the-art code LLM quantized to 4-bit precision.",
-    highlight: "8B PARAMS",
-    color: "from-purple-500 to-pink-500"
-  },
-  {
-    icon: Zap,
-    title: "CLI-first",
-    description: "Simple terminal interface. Pipe-friendly. CI/CD ready.",
-    highlight: "DEVELOPER UX",
-    color: "from-yellow-500 to-orange-500"
+    title: "DeepSeek Coder v2",
+    description: "Advanced code LLM for contextual vulnerability analysis.",
+    highlight: "DEEPSEEK",
+    color: "from-orange-500 to-amber-500"
   },
   {
     icon: Shield,

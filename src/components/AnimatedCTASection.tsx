@@ -109,15 +109,15 @@ export function AnimatedCTASection() {
                   <Button
                     className="w-full bg-blue-600 hover:bg-blue-600/80 shadow-lg hover:shadow-xl transition-all"
                     onClick={() => {
-                      // Placeholder for VS Code marketplace link
-                      window.open('vscode:extension/LocalSentinel.localsentinel-ai', '_blank');
+                      // Link to GitHub releases
+                      window.open('https://github.com/HarrisHamid/LocalSentinel.ai/releases/tag/v0.0.1', '_blank');
                     }}
                   >
                     <motion.span
                       animate={{ opacity: [1, 0.5, 1] }}
                       transition={{ duration: 2, repeat: Infinity }}
                     >
-                      Install Extension
+                      Download Extension
                     </motion.span>
                     <Download className="w-4 h-4 ml-2" />
                   </Button>
@@ -166,7 +166,7 @@ export function AnimatedCTASection() {
                   </Button>
                 </motion.div>
                 <p className="text-xs text-blue-200 mt-2">
-                  Python 3.11+ • ONNX Runtime
+                  Python 3.12+ • Rust • Node.js 16+
                 </p>
               </CardContent>
             </Card>
@@ -232,15 +232,6 @@ export function AnimatedCTASection() {
             ⚠️ Using cached stats (API temporarily unavailable)
           </motion.div>
         )}
-        {stats && !error && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="mt-4 text-xs text-blue-200/60"
-          >
-            📊 Updated automatically every 5 minutes
-          </motion.div>
-        )}
 
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -251,8 +242,8 @@ export function AnimatedCTASection() {
           whileHover={{ scale: 1.02 }}
         >
           <p className="text-yellow-100">
-            <strong>System requirements:</strong> Windows 11 on Snapdragon X Elite.
-            Intel/AMD support coming Q2 2025.
+            <strong>Built for:</strong> Qualcomm NYU Hackathon 2025.
+            Works on Windows, macOS, and Linux with VS Code 1.74+.
           </p>
         </motion.div>
       </div>

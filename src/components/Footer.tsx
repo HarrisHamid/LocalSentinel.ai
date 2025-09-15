@@ -130,7 +130,7 @@ export function Footer() {
 
         <div className="border-t border-slate-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm">
-            © 2024 LocalSentinel.ai. Open source under MIT
+            © 2025 LocalSentinel.ai. Open source under MIT
             License.
           </p>
           <div className="flex gap-6 text-sm mt-4 md:mt-0">
@@ -153,6 +153,12 @@ export function Footer() {
               Security
             </a>
           </div>
+        </div>
+
+        <div className="mt-6 text-center">
+          <p className="text-xs text-slate-500">
+            Built for Qualcomm NYU Hackathon 2025
+          </p>
         </div>
       </div>
     </footer>

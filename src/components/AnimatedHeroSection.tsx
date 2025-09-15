@@ -147,9 +147,9 @@ export function AnimatedHeroSection() {
               className="flex flex-wrap gap-4 text-sm text-slate-400"
             >
               {[
-                { icon: Lock, text: "100% locally", color: "text-green-400" },
-                { icon: Shield, text: "No telemetry", color: "text-blue-400" },
-                { icon: Github, text: "Open Source", color: "text-purple-400" }
+                { icon: Lock, text: "Zero Cloud Dependencies", color: "text-green-400" },
+                { icon: Shield, text: "Complete Data Privacy", color: "text-blue-400" },
+                { icon: Github, text: "Fully Auditable Code", color: "text-purple-400" }
               ].map((item, index) => (
                 <motion.div
                   key={item.text}
@@ -175,15 +175,15 @@ export function AnimatedHeroSection() {
                   size="lg"
                   className="bg-blue-600 hover:bg-blue-600/80 text-white shadow-lg hover:shadow-xl transition-all"
                   onClick={() => {
-                    // Placeholder for VS Code marketplace link
-                    window.open('vscode:extension/LocalSentinel.localsentinel-ai', '_blank');
+                    // Link to GitHub releases
+                    window.open('https://github.com/HarrisHamid/LocalSentinel.ai/releases/tag/v0.0.1', '_blank');
                   }}
                 >
                   <motion.span
                     animate={{ opacity: [1, 0.7, 1] }}
                     transition={{ duration: 2, repeat: Infinity }}
                   >
-                    Install VS Code Extension
+                    Download VS Code Extension
                   </motion.span>
                 </Button>
               </motion.div>
