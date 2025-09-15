@@ -82,8 +82,7 @@ export function AnimatedHeader() {
                   size="sm"
                   className="bg-blue-600 hover:bg-blue-600/80 shadow-lg hover:shadow-xl transition-all"
                   onClick={() => {
-                    // Placeholder for VS Code marketplace link
-                    window.open('vscode:extension/LocalSentinel.localsentinel-ai', '_blank');
+                    window.open('https://github.com/HarrisHamid/LocalSentinel.ai/releases/tag/v0.0.1', '_blank');
                   }}
                 >
                   Install Extension
@@ -141,7 +140,10 @@ export function AnimatedHeader() {
                   <Github className="w-4 h-4 mr-2" />
                   View on GitHub
                 </Button>
-                <Button className="w-full bg-blue-600 hover:bg-blue-600/80 transition-all">
+                <Button
+                  className="w-full bg-blue-600 hover:bg-blue-600/80 transition-all"
+                  onClick={() => window.open('https://github.com/HarrisHamid/LocalSentinel.ai/releases/tag/v0.0.1', '_blank')}
+                >
                   Install Extension
                 </Button>
               </div>

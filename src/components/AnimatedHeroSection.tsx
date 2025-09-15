@@ -138,7 +138,7 @@ export function AnimatedHeroSection() {
                 className="text-xl text-slate-300 max-w-lg"
               >
                 AI-powered security scanner that runs 100% offline.
-                Built for Snapdragon X Elite.
+                Built for Snapdragon X Elite. Perfect for AI pair-programming with Claude Code & Cursor.
               </motion.p>
             </motion.div>
 
@@ -149,7 +149,7 @@ export function AnimatedHeroSection() {
               {[
                 { icon: Lock, text: "Zero Cloud Dependencies", color: "text-green-400" },
                 { icon: Shield, text: "Complete Data Privacy", color: "text-blue-400" },
-                { icon: Github, text: "Fully Auditable Code", color: "text-purple-400" }
+                { icon: Github, text: "Open Source", color: "text-purple-400" }
               ].map((item, index) => (
                 <motion.div
                   key={item.text}

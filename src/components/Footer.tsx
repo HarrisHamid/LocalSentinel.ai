@@ -1,4 +1,4 @@
-import { Github, Twitter, Mail } from "lucide-react";
+import { Github, Mail } from "lucide-react";
 import logo from "../assets/logo_white.svg";
 
 export function Footer() {
@@ -28,7 +28,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <a
-                  href="#"
+                  href="#features"
                   className="hover:text-white transition-colors"
                 >
                   Features
@@ -36,7 +36,9 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="https://github.com/HarrisHamid/LocalSentinel.ai/releases/tag/v0.0.1"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="hover:text-white transition-colors"
                 >
                   Download
@@ -44,7 +46,9 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="https://github.com/HarrisHamid/LocalSentinel.ai/blob/main/README.md"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="hover:text-white transition-colors"
                 >
                   Documentation
@@ -52,7 +56,9 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="https://github.com/HarrisHamid/LocalSentinel.ai/releases"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="hover:text-white transition-colors"
                 >
                   Changelog
@@ -76,7 +82,9 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="https://github.com/HarrisHamid/LocalSentinel.ai/issues"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="hover:text-white transition-colors"
                 >
                   Issues
@@ -84,7 +92,9 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="https://github.com/HarrisHamid/LocalSentinel.ai/blob/main/CONTRIBUTING.md"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="hover:text-white transition-colors"
                 >
                   Contributing
@@ -92,7 +102,9 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="https://github.com/HarrisHamid/LocalSentinel.ai/blob/main/LICENSE"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="hover:text-white transition-colors"
                 >
                   License
@@ -113,13 +125,7 @@ export function Footer() {
                 <Github className="w-5 h-5" />
               </a>
               <a
-                href="#"
-                className="hover:text-white transition-colors"
-              >
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a
-                href="#"
+                href="mailto:akbar.pathan034@gmail.com"
                 className="hover:text-white transition-colors"
               >
                 <Mail className="w-5 h-5" />
@@ -135,19 +141,25 @@ export function Footer() {
           </p>
           <div className="flex gap-6 text-sm mt-4 md:mt-0">
             <a
-              href="#"
+              href="https://github.com/HarrisHamid/LocalSentinel.ai/blob/main/PRIVACY.md"
+              target="_blank"
+              rel="noopener noreferrer"
               className="hover:text-white transition-colors"
             >
               Privacy
             </a>
             <a
-              href="#"
+              href="https://github.com/HarrisHamid/LocalSentinel.ai/blob/main/LICENSE"
+              target="_blank"
+              rel="noopener noreferrer"
               className="hover:text-white transition-colors"
             >
               Terms
             </a>
             <a
-              href="#"
+              href="https://github.com/HarrisHamid/LocalSentinel.ai/security"
+              target="_blank"
+              rel="noopener noreferrer"
               className="hover:text-white transition-colors"
             >
               Security
